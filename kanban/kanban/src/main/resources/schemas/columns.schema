@@ -1,0 +1,7 @@
+CREATE TABLE columns (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    status_title TEXT,
+    board_id INTEGER,
+    FOREIGN KEY (board_id) REFERENCES boards (id)
+        ON DELETE CASCADE
+);

@@ -1,0 +1,8 @@
+CREATE TABLE subtasks (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    subtask_title TEXT,
+    is_complete BOOLEAN,
+    task_id INTEGER,
+    FOREIGN KEY (task_id) REFERENCES tasks (id)
+        ON DELETE CASCADE
+);

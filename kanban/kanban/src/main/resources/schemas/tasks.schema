@@ -1,0 +1,10 @@
+CREATE TABLE tasks (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    task_title TEXT,
+    description TEXT,
+    status_column TEXT,
+    column_id INTEGER,
+    FOREIGN KEY (column_id) REFERENCES columns (id)
+        ON DELETE CASCADE
+);

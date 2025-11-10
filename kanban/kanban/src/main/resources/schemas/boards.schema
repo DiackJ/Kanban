@@ -1,0 +1,9 @@
+CREATE TABLE boards (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    created_at TIMESTAMP,
+    board_title TEXT,
+    description TEXT,
+    user_id UUID,
+    FOREIGN KEY (user_id) REFERENCES users (id)
+        ON DELETE CASCADE
+);
