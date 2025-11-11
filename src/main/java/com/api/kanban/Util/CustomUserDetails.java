@@ -1,8 +1,6 @@
 package com.api.kanban.Util;
 
 import com.api.kanban.Entity.Users;
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,13 +9,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails {
-    private String username;
-    private String password;
-    @Getter
-    private UUID id;
+    private final String password;
+    private final UUID id;
 
     public CustomUserDetails(Users users) {
-        this.username = users.getEmail();
         this.password = users.getPasswordHash();
         this.id = users.getId();
     }
@@ -34,6 +29,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return String.valueOf(id);
     }
 }
