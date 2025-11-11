@@ -19,6 +19,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    #SPRING_DATASOURCE_URL: ${{secrets.SPRING_DATASOURCE_URL}}
 
     steps:
       - uses: actions/checkout@v4

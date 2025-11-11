@@ -13,6 +13,7 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String displayName;
+    private String email;
     private String passwordHash;
     @OneToMany
     private List<Boards> boardsList;
