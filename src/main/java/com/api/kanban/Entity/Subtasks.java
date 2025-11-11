@@ -1,12 +1,10 @@
 package com.api.kanban.Entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
+@Entity
 public class Subtasks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
