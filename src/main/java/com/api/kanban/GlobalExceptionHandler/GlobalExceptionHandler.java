@@ -1,6 +1,7 @@
 package com.api.kanban.GlobalExceptionHandler;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,6 +18,32 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleResourceNotFound(ResourceAccessException e) {
         Map<String, String> err = new HashMap<>();
         err.put("NOT FOUND", e.getMessage());
+        return err;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidation(MethodArgumentNotValidException e) {
+        Map<String, String> error = new HashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(er ->
+            error.put(er.getField(), er.getDefaultMessage())
+        );
+        return error;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleBadInputs(IllegalArgumentException e) {
+        Map<String, String> err = new HashMap<>();
+        err.put("ILLEGAL INPUT", e.getMessage());
+        return err;
+    }
+
+    @ExceptionHandler(IllegalAccessError.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleDuplicateUser(IllegalAccessError e) {
+        Map<String, String> err = new HashMap<>();
+        err.put("ERROR", e.getMessage());
         return err;
     }
 }
