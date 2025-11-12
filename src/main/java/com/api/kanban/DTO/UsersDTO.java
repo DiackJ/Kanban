@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UsersDTO {
-    private String displayName;
     private String passwordHash;
+    private String email;
 }

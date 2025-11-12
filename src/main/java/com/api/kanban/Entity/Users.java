@@ -15,6 +15,8 @@ public class Users {
     private String displayName;
     private String email;
     private String passwordHash;
+    private Integer verificationCode;
+    private boolean enabled;
     @OneToMany
     private List<Boards> boardsList;
 }
