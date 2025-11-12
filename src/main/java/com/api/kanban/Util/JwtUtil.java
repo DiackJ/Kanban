@@ -19,6 +19,7 @@ public class JwtUtil {
     public String createToken(UUID userId, String email) {
         return Jwts.builder()
                 .subject(String.valueOf(userId))
+                .claim("email", email)
                 .issuer("kanban-api")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7))) // expires in 7 days
@@ -44,6 +45,16 @@ public class JwtUtil {
                 .getPayload();
 
         return claims.getExpiration();
+    }
+
+    public String extractEmail(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("email", String.class);
     }
 
     public boolean isExpired(String token) {
