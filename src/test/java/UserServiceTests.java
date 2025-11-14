@@ -12,6 +12,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -48,5 +50,20 @@ public class UserServiceTests {
 
         // note-to-self: UUIDs do not get generated for unit tests so this line is always false.
         //assertNotNull(user.getId());
+    }
+
+    @Test
+    void createExistingUser_shouldNotCreateUser() {
+        Users existingUser = new Users();
+        when(usersRepository.findByEmail("test@test.com")).thenReturn(Optional.of(existingUser));
+        //when(usersRepository.save(any(Users.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        SignupRequest dto = new SignupRequest();
+        dto.setEmail("test@test.com");
+        dto.setPasswordHash("somecoolpassword123");
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            usersService.addNewUser(dto);
+        });
     }
 }
