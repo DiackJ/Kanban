@@ -1,5 +1,6 @@
 package com.api.kanban.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,6 +15,7 @@ public class Users {
     private UUID id;
     private String displayName;
     private String email;
+    @JsonIgnore
     private String passwordHash;
     private Integer verificationCode;
     private boolean enabled;

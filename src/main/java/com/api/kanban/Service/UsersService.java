@@ -1,7 +1,6 @@
 package com.api.kanban.Service;
 
 import com.api.kanban.DTO.SignupRequest;
-import com.api.kanban.DTO.UsersDTO;
 import com.api.kanban.DTO.VerifyRequest;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.UsersRepository;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.security.SecureRandom;
-import java.util.Random;
-
 
 @Service
 public class UsersService {
@@ -26,7 +23,7 @@ public class UsersService {
     private JavaMailSender mailSender;
 
     // add a new user
-    public void addNewUser(SignupRequest dto) {
+    public Users addNewUser(SignupRequest dto) {
         Users existingUser = usersRepository.findByEmail(dto.getEmail()).orElse(null);
 
         if (existingUser != null) {
@@ -51,6 +48,7 @@ public class UsersService {
         message.setText("Your kanban verification code is: " + verificationCode);
         mailSender.send(message);
 
+        return user;
     }
 
     public Users verifyAccount(VerifyRequest req, String email) {
