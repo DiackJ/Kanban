@@ -1,9 +1,14 @@
 package com.api.kanban.Service;
 
-import com.api.kanban.DTO.SignupRequest;
-import com.api.kanban.DTO.VerifyRequest;
+import com.api.kanban.DTO.*;
+import com.api.kanban.Entity.Boards;
+import com.api.kanban.Entity.Columns;
+import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Entity.Users;
+import com.api.kanban.Repository.BoardsRepository;
 import com.api.kanban.Repository.UsersRepository;
+import com.api.kanban.Util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UsersService {
@@ -21,6 +28,10 @@ public class UsersService {
     private PasswordEncoder encoder;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private BoardsRepository boardsRepository;
 
     // add a new user
     public Users addNewUser(SignupRequest dto) {
@@ -51,8 +62,9 @@ public class UsersService {
         return user;
     }
 
-    public Users verifyAccount(VerifyRequest req, String email) {
+    public void verifyAccount(VerifyRequest req, String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new ResourceAccessException("user not found"));
+        System.out.println(user.getVerificationCode());
 
         if (req.getCode() != user.getVerificationCode()) {
             throw new IllegalArgumentException("Verification code is incorrect");
@@ -60,6 +72,60 @@ public class UsersService {
 
         user.setEnabled(true);
         user.setVerificationCode(null);
-        return usersRepository.save(user);
+        usersRepository.save(user);
     }
+
+    public Users getUser(HttpServletRequest req) throws ResourceAccessException{
+        String token = jwtUtil.extractTokenFromHeader(req);
+        String email = jwtUtil.extractEmail(token);
+
+        return usersRepository.findByEmail(email).orElseThrow(() -> new ResourceAccessException("user not found"));
+    }
+
+    public boolean userIsVerified(Users user) {
+        return user.isEnabled();
+    }
+
+    // return a list of board objs that contain the title and id for navigation
+    public NavInfo getNavInfo(Users user) {
+        List<Boards> boards = user.getBoardsList();
+
+        List<GetBoardDTO> dtoBoards = boards.stream().map(b -> new GetBoardDTO(
+                b.getBoardTitle(),
+                b.getId()
+        )).toList();
+
+        NavInfo info = new NavInfo();
+        info.setBoardsList(dtoBoards);
+
+        return info;
+    }
+
+    // return the details for the currently selected board
+    public BoardDetailsDTO getCurrentBoard(long id) {
+        Boards b = boardsRepository.findById(id).orElseThrow(() -> new ResourceAccessException("this board doesn't exist"));
+        BoardDetailsDTO board = new BoardDetailsDTO();
+
+        // get each column of the board
+        List<GetColumnsDTO> c = b.getColumnsList().stream().map(col -> {
+            GetColumnsDTO dto = new GetColumnsDTO();
+            dto.setId(col.getId());
+            dto.setStatusTitle(col.getStatusTitle());
+
+            // for each column get each task list
+            List<GetTasksDTO> tasks = col.getTasksList().stream().map(t -> new GetTasksDTO(
+                    t.getId(),
+                    t.getTaskTitle()
+            )).toList();
+
+            dto.setTasks(tasks);
+            return dto;
+        }).toList();
+
+        board.setBoardTitle(b.getBoardTitle());
+        board.setColumns(c);
+
+        return board;
+    }
+
 }

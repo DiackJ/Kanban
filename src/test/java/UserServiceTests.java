@@ -56,7 +56,6 @@ public class UserServiceTests {
     void createExistingUser_shouldNotCreateUser() {
         Users existingUser = new Users();
         when(usersRepository.findByEmail("test@test.com")).thenReturn(Optional.of(existingUser));
-        //when(usersRepository.save(any(Users.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         SignupRequest dto = new SignupRequest();
         dto.setEmail("test@test.com");
