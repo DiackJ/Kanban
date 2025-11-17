@@ -1,3 +1,4 @@
+import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.SignupRequest;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.UsersRepository;
@@ -61,7 +62,7 @@ public class UserServiceTests {
         dto.setEmail("test@test.com");
         dto.setPasswordHash("somecoolpassword123");
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(ResourceConflictException.class, () -> {
             usersService.addNewUser(dto);
         });
     }
