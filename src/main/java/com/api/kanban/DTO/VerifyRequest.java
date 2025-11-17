@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class VerifyRequest {
-    private int code;
+    private Integer code;
     private String email;
 }

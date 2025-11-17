@@ -19,6 +19,7 @@ import org.springframework.web.client.ResourceAccessException;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UsersService {
@@ -66,7 +67,7 @@ public class UsersService {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
         System.out.println(user.getVerificationCode());
 
-        if (req.getCode() != user.getVerificationCode()) {
+        if (!Objects.equals(req.getCode(), user.getVerificationCode())) {
             throw new IllegalArgumentException("Verification code is incorrect");
         }
 
@@ -117,6 +118,18 @@ public class UsersService {
         board.setColumns(c);
 
         return board;
+    }
+
+    // regenerate and resend a new verification code
+    public void resendNewVerificationCode(String email) {
+        SecureRandom random = new SecureRandom();
+        Integer code = 100000 + random.nextInt(900000);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("kanban verification code");
+        message.setText("Your new kanban verification code is: " + code);
+        mailSender.send(message);
     }
 
 }

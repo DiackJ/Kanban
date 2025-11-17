@@ -36,6 +36,13 @@ public class UsersController {
     // make a request to sign up
     @PostMapping("/auth/api/v1/signup")
     public ResponseEntity<String> addNewUser(@RequestBody SignupRequest dto) {
+        if (dto.getEmail() == null) {
+            throw new IllegalArgumentException("Email field cannot be blank");
+        }
+        if (dto.getPasswordHash() == null) {
+            throw new IllegalArgumentException("Password field cannot be blank");
+        }
+
         usersService.addNewUser(dto);
 
         return ResponseEntity
@@ -46,6 +53,10 @@ public class UsersController {
     // make a request to verify new account
     @PostMapping("/auth/api/v1/verification")
     public ResponseEntity<String> verifyUser(@RequestBody VerifyRequest req, HttpServletResponse res) {
+        if (req.getCode() == null) {
+            throw new IllegalArgumentException("Verification code cannot be blank");
+        }
+
         Users user = usersService.verifyAccount(req, req.getEmail());
 
         String token = jwtUtil.createToken(user.getId(), user.getEmail());
@@ -124,5 +135,14 @@ public class UsersController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(details);
+    }
+
+    @PostMapping("/auth/api/v1/reverify")
+    public ResponseEntity<String> resendVerification(@RequestBody String email) {
+        usersService.resendNewVerificationCode(email);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("new code sent to " + email);
     }
 }
