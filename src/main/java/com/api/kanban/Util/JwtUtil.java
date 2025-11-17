@@ -2,7 +2,9 @@ package com.api.kanban.Util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -74,6 +76,18 @@ public class JwtUtil {
             return header.substring(7); // remove "Bearer " to get just the token
         }
 
+        return null;
+    }
+
+    public String extractTokenFromCookie(HttpServletRequest req) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals("jwt")) {
+                    return c.getValue();
+                }
+            }
+        }
         return null;
     }
 }

@@ -62,7 +62,7 @@ public class UsersService {
         return user;
     }
 
-    public void verifyAccount(VerifyRequest req, String email) {
+    public Users verifyAccount(VerifyRequest req, String email) {
         Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
         System.out.println(user.getVerificationCode());
 
@@ -72,11 +72,11 @@ public class UsersService {
 
         user.setEnabled(true);
         user.setVerificationCode(null);
-        usersRepository.save(user);
+        return usersRepository.save(user);
     }
 
     public Users getUser(HttpServletRequest req) throws ResourceAccessException{
-        String token = jwtUtil.extractTokenFromHeader(req);
+        String token = jwtUtil.extractTokenFromCookie(req);
         String email = jwtUtil.extractEmail(token);
 
         return usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));

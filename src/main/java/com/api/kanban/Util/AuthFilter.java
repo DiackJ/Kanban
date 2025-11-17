@@ -4,6 +4,7 @@ import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.UsersRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,17 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // get the jwt token and the user's email
-        String jwt = authHeader.substring(7);
-        String username = jwtUtil.extractEmail(jwt);
+        String jwt = null;
+        String username = null;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("jwt")) {
+                    jwt = cookie.getValue();
+                    username = jwtUtil.extractEmail(jwt);
+                }
+            }
+        }
 
         // check if user is verified (user needs to be verified to have access to app)
         Users user = usersRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("user not found"));
@@ -54,7 +63,7 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // if the user exists and is not already logged in
+        // if the user exists and is not already logged in and is verified
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             //extract that user's details
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
