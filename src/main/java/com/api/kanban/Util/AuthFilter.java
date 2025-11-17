@@ -1,5 +1,7 @@
 package com.api.kanban.Util;
 
+import com.api.kanban.Entity.Users;
+import com.api.kanban.Repository.UsersRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,6 +24,8 @@ public class AuthFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private UsersRepository usersRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -41,6 +46,13 @@ public class AuthFilter extends OncePerRequestFilter {
         // get the jwt token and the user's email
         String jwt = authHeader.substring(7);
         String username = jwtUtil.extractEmail(jwt);
+
+        // check if user is verified (user needs to be verified to have access to app)
+        Users user = usersRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("user not found"));
+        if (!user.isEnabled()) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "This account is not verified.");
+            return;
+        }
 
         // if the user exists and is not already logged in
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

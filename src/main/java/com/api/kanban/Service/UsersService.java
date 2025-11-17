@@ -1,9 +1,9 @@
 package com.api.kanban.Service;
 
+import com.api.kanban.CustomException.ResourceConflictException;
+import com.api.kanban.CustomException.ResourceNotFound;
 import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Boards;
-import com.api.kanban.Entity.Columns;
-import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
 import com.api.kanban.Repository.UsersRepository;
@@ -12,12 +12,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,7 +38,7 @@ public class UsersService {
         Users existingUser = usersRepository.findByEmail(dto.getEmail()).orElse(null);
 
         if (existingUser != null) {
-            throw new IllegalArgumentException("User already exists with this email.");
+            throw new ResourceConflictException("User already exists with this email.");
         }
 
         Users user = new Users();
@@ -63,7 +63,7 @@ public class UsersService {
     }
 
     public void verifyAccount(VerifyRequest req, String email) {
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new ResourceAccessException("user not found"));
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
         System.out.println(user.getVerificationCode());
 
         if (req.getCode() != user.getVerificationCode()) {
@@ -79,11 +79,7 @@ public class UsersService {
         String token = jwtUtil.extractTokenFromHeader(req);
         String email = jwtUtil.extractEmail(token);
 
-        return usersRepository.findByEmail(email).orElseThrow(() -> new ResourceAccessException("user not found"));
-    }
-
-    public boolean userIsVerified(Users user) {
-        return user.isEnabled();
+        return usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
     }
 
     // return a list of board objs that contain the title and id for navigation
@@ -98,7 +94,7 @@ public class UsersService {
 
     // return the details for the currently selected board
     public BoardDetailsDTO getCurrentBoard(long id) {
-        Boards b = boardsRepository.findById(id).orElseThrow(() -> new ResourceAccessException("this board doesn't exist"));
+        Boards b = boardsRepository.findById(id).orElseThrow(() -> new ResourceNotFound("This board could not be found."));
         BoardDetailsDTO board = new BoardDetailsDTO();
 
         // get each column of the board

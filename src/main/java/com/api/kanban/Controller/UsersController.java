@@ -1,15 +1,20 @@
 package com.api.kanban.Controller;
 
-import com.api.kanban.DTO.BoardDetailsDTO;
-import com.api.kanban.DTO.GetBoardDTO;
-import com.api.kanban.DTO.SignupRequest;
-import com.api.kanban.DTO.VerifyRequest;
+import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Service.UsersService;
+import com.api.kanban.Util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +23,15 @@ import java.util.List;
 public class UsersController {
     @Autowired
     private UsersService usersService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // make a request to sign up
-    @PostMapping("/auth/api/v1/user")
-    public ResponseEntity<String> addNewUser(@RequestBody SignupRequest dto) {
-        usersService.addNewUser(dto);
+    @PostMapping("/auth/api/v1/signup")
+    public ResponseEntity<String> addNewUser(@RequestBody SignupRequest dto, HttpServletResponse res) {
+        Users user = usersService.addNewUser(dto);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -37,6 +46,21 @@ public class UsersController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body("account verified");
+    }
+
+    // make request to log in
+    @PostMapping("/auth/api/v1/login")
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequest req) {
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
+        );
+        if (auth.isAuthenticated()) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body("login successful");
+        } else {
+            throw new BadCredentialsException("Username or password is incorrect.");
+        }
     }
 
     // make a request to get list of boards for nav bar
