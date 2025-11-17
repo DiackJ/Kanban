@@ -15,9 +15,9 @@ public class Tasks {
     private LocalDateTime createdAt;
     private String taskTitle;
     private String description;
-    private String statusColumn;
     @ManyToOne
     private Columns column;
+    private String statusColumn; // = column.getStatusColumn
     @OneToMany
     private List<Subtasks> subtasksList;
 }

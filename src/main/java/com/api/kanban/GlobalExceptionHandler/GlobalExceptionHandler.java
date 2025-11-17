@@ -1,6 +1,10 @@
 package com.api.kanban.GlobalExceptionHandler;
 
+import com.api.kanban.CustomException.ResourceConflictException;
+import com.api.kanban.CustomException.ResourceNotFound;
+import com.api.kanban.CustomException.UserNotVerifiedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -12,25 +16,16 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    // handle resource not found errors
-    @ExceptionHandler(ResourceAccessException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleResourceNotFound(ResourceAccessException e) {
+    // handle user not found errors
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleResourceNotFound(UsernameNotFoundException e) {
         Map<String, String> err = new HashMap<>();
-        err.put("NOT FOUND", e.getMessage());
+        err.put("USER NOT FOUND", e.getMessage());
         return err;
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidation(MethodArgumentNotValidException e) {
-        Map<String, String> error = new HashMap<>();
-        e.getBindingResult().getFieldErrors().forEach(er ->
-            error.put(er.getField(), er.getDefaultMessage())
-        );
-        return error;
-    }
-
+    // handle bad arguments / bad user input
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleBadInputs(IllegalArgumentException e) {
@@ -39,11 +34,41 @@ public class GlobalExceptionHandler {
         return err;
     }
 
-    @ExceptionHandler(IllegalAccessError.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> handleDuplicateUser(IllegalAccessError e) {
+    // handle errors when a fetched resource (ex: board) is not found
+    @ExceptionHandler(ResourceNotFound.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleDuplicateUser(ResourceNotFound e) {
         Map<String, String> err = new HashMap<>();
-        err.put("ERROR", e.getMessage());
+        err.put("ERROR FINDING RESOURCE", e.getMessage());
         return err;
     }
+
+    // handle errors for an unverified user
+    @ExceptionHandler(UserNotVerifiedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> handleUserNotVerified(UserNotVerifiedException e) {
+        Map<String, String> err = new HashMap<>();
+        err.put("ERROR ACCESSING ACCOUNT", e.getMessage());
+        return err;
+    }
+
+    // handle errors when a resource already exists
+    @ExceptionHandler(ResourceConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleConflictingResources(ResourceConflictException e) {
+        Map<String, String> err = new HashMap<>();
+        err.put("RESOURCE CONFLICT ERROR", e.getMessage());
+        return err;
+    }
+
+    //    // handle hibernate validation errors
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public Map<String, String> handleValidation(MethodArgumentNotValidException e) {
+//        Map<String, String> error = new HashMap<>();
+//        e.getBindingResult().getFieldErrors().forEach(er ->
+//            error.put(er.getField(), er.getDefaultMessage())
+//        );
+//        return error;
+//    }
 }

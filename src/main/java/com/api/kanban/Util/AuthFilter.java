@@ -1,7 +1,10 @@
 package com.api.kanban.Util;
 
+import com.api.kanban.Entity.Users;
+import com.api.kanban.Repository.UsersRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,6 +25,8 @@ public class AuthFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private UsersRepository usersRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -38,11 +44,26 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        // get the jwt token and the user's email
-        String jwt = authHeader.substring(7);
-        String username = jwtUtil.extractEmail(jwt);
+        String jwt = null;
+        String username = null;
 
-        // if the user exists and is not already logged in
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("jwt")) {
+                    jwt = cookie.getValue();
+                    username = jwtUtil.extractEmail(jwt);
+                }
+            }
+        }
+
+        // check if user is verified (user needs to be verified to have access to app)
+        Users user = usersRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("user not found"));
+        if (!user.isEnabled()) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "This account is not verified.");
+            return;
+        }
+
+        // if the user exists and is not already logged in and is verified
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             //extract that user's details
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);

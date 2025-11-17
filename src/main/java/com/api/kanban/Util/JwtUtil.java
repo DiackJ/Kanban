@@ -2,6 +2,9 @@ package com.api.kanban.Util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,5 +67,27 @@ public class JwtUtil {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         String id = String.valueOf(extractUserId(token));
         return (!isExpired(token) && id.equals(userDetails.getUsername()));
+    }
+
+    public String extractTokenFromHeader(HttpServletRequest req) {
+        String header = req.getHeader("Authorization");
+
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7); // remove "Bearer " to get just the token
+        }
+
+        return null;
+    }
+
+    public String extractTokenFromCookie(HttpServletRequest req) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (c.getName().equals("jwt")) {
+                    return c.getValue();
+                }
+            }
+        }
+        return null;
     }
 }

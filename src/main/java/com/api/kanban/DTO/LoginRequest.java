@@ -3,7 +3,7 @@ package com.api.kanban.DTO;
 import lombok.Data;
 
 @Data
-public class VerifyRequest {
-    private Integer code;
+public class LoginRequest {
     private String email;
+    private String password;
 }

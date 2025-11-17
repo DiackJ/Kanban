@@ -38,8 +38,8 @@ public class SecurityConfig {
                 .csrf(c -> c.disable())
                 .formLogin(f -> f.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .anyRequest().authenticated()
+                       // .requestMatchers("/auth/**").permitAll()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider((authenticationProvider()))

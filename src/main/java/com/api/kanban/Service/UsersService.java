@@ -1,17 +1,25 @@
 package com.api.kanban.Service;
 
-import com.api.kanban.DTO.SignupRequest;
-import com.api.kanban.DTO.VerifyRequest;
+import com.api.kanban.CustomException.ResourceConflictException;
+import com.api.kanban.CustomException.ResourceNotFound;
+import com.api.kanban.DTO.*;
+import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Users;
+import com.api.kanban.Repository.BoardsRepository;
 import com.api.kanban.Repository.UsersRepository;
+import com.api.kanban.Util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UsersService {
@@ -21,13 +29,17 @@ public class UsersService {
     private PasswordEncoder encoder;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private BoardsRepository boardsRepository;
 
     // add a new user
     public Users addNewUser(SignupRequest dto) {
         Users existingUser = usersRepository.findByEmail(dto.getEmail()).orElse(null);
 
         if (existingUser != null) {
-            throw new IllegalArgumentException("User already exists with this email.");
+            throw new ResourceConflictException("User already exists with this email.");
         }
 
         Users user = new Users();
@@ -52,9 +64,10 @@ public class UsersService {
     }
 
     public Users verifyAccount(VerifyRequest req, String email) {
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new ResourceAccessException("user not found"));
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        System.out.println(user.getVerificationCode());
 
-        if (req.getCode() != user.getVerificationCode()) {
+        if (!Objects.equals(req.getCode(), user.getVerificationCode())) {
             throw new IllegalArgumentException("Verification code is incorrect");
         }
 
@@ -62,4 +75,61 @@ public class UsersService {
         user.setVerificationCode(null);
         return usersRepository.save(user);
     }
+
+    public Users getUser(HttpServletRequest req) throws ResourceAccessException{
+        String token = jwtUtil.extractTokenFromCookie(req);
+        String email = jwtUtil.extractEmail(token);
+
+        return usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
+    }
+
+    // return a list of board objs that contain the title and id for navigation
+    public List<GetBoardDTO> getNavInfo(Users user) {
+        List<Boards> boards = user.getBoardsList();
+
+        return boards.stream().map(b -> new GetBoardDTO(
+                b.getBoardTitle(),
+                b.getId()
+        )).toList();
+    }
+
+    // return the details for the currently selected board
+    public BoardDetailsDTO getCurrentBoard(long id) {
+        Boards b = boardsRepository.findById(id).orElseThrow(() -> new ResourceNotFound("This board could not be found."));
+        BoardDetailsDTO board = new BoardDetailsDTO();
+
+        // get each column of the board
+        List<GetColumnsDTO> c = b.getColumnsList().stream().map(col -> {
+            GetColumnsDTO dto = new GetColumnsDTO();
+            dto.setId(col.getId());
+            dto.setStatusTitle(col.getStatusTitle());
+
+            // for each column get each task list
+            List<GetTasksDTO> tasks = col.getTasksList().stream().map(t -> new GetTasksDTO(
+                    t.getId(),
+                    t.getTaskTitle()
+            )).toList();
+
+            dto.setTasks(tasks);
+            return dto;
+        }).toList();
+
+        board.setBoardTitle(b.getBoardTitle());
+        board.setColumns(c);
+
+        return board;
+    }
+
+    // regenerate and resend a new verification code
+    public void resendNewVerificationCode(String email) {
+        SecureRandom random = new SecureRandom();
+        Integer code = 100000 + random.nextInt(900000);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("kanban verification code");
+        message.setText("Your new kanban verification code is: " + code);
+        mailSender.send(message);
+    }
+
 }
