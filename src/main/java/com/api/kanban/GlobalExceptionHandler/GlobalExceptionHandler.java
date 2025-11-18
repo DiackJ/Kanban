@@ -1,18 +1,16 @@
 package com.api.kanban.GlobalExceptionHandler;
 
 import com.api.kanban.CustomException.ResourceConflictException;
-import com.api.kanban.CustomException.ResourceNotFound;
 import com.api.kanban.CustomException.UserNotVerifiedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.ResourceAccessException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -35,9 +33,9 @@ public class GlobalExceptionHandler {
     }
 
     // handle errors when a fetched resource (ex: board) is not found
-    @ExceptionHandler(ResourceNotFound.class)
+    @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleDuplicateUser(ResourceNotFound e) {
+    public Map<String, String> handleDuplicateUser(NoSuchElementException e) {
         Map<String, String> err = new HashMap<>();
         err.put("ERROR FINDING RESOURCE", e.getMessage());
         return err;
