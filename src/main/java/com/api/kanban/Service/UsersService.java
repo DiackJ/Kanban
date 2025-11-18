@@ -121,12 +121,17 @@ public class UsersService {
     }
 
     // regenerate and resend a new verification code
-    public void resendNewVerificationCode(String email) {
+    public void resendNewVerificationCode(ReverifyRequest dto) {
+        Users user = usersRepository.findByEmail(dto.getEmail()).orElseThrow(() -> new UsernameNotFoundException("no user found"));
+
         SecureRandom random = new SecureRandom();
         Integer code = 100000 + random.nextInt(900000);
 
+        user.setVerificationCode(code);
+        usersRepository.save(user);
+
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
+        message.setTo(dto.getEmail());
         message.setSubject("kanban verification code");
         message.setText("Your new kanban verification code is: " + code);
         mailSender.send(message);
