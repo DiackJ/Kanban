@@ -79,11 +79,11 @@ public class UsersController {
     @PostMapping("/auth/api/v1/login")
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest dto, HttpServletRequest req, HttpServletResponse res) {
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
+                new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPasswordHash())
         );
         if (auth.isAuthenticated()) {
-            Users user = usersService.getUser(req);
-            String token = jwtUtil.createToken(user.getId(), user.getEmail());
+            Users user = usersRepository.findByEmail(dto.getEmail()).orElseThrow();
+            String token = jwtUtil.createToken(user.getId(), dto.getEmail());
             ResponseCookie cookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)
                     .secure(false)
@@ -138,11 +138,11 @@ public class UsersController {
     }
 
     @PostMapping("/auth/api/v1/reverify")
-    public ResponseEntity<String> resendVerification(@RequestBody String email) {
-        usersService.resendNewVerificationCode(email);
+    public ResponseEntity<String> resendVerification(@RequestBody ReverifyRequest dto) {
+        usersService.resendNewVerificationCode(dto);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("new code sent to " + email);
+                .body("new code sent to " + dto.getEmail());
     }
 }
