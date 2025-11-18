@@ -14,12 +14,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class BoardsService {
     @Autowired
     private BoardsRepository boardsRepository;
 
+    // create a new kanban board
     public Boards createNewBoard(BoardsDTO dto, Users user) {
         // check if a board with input title already exists
         Boards existingBoard = boardsRepository.findByBoardTitle(dto.getBoardTitle()).orElse(null);
@@ -52,4 +54,11 @@ public class BoardsService {
 
         return boardsRepository.save(board);
     }
+
+    // edit an existing board
+//    public BoardsDTO editBoard(BoardsDTO dto, long id) {
+//        Boards board = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("board not found"));
+//
+//
+//    }
 }

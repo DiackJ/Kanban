@@ -1,7 +1,6 @@
 package com.api.kanban.Service;
 
 import com.api.kanban.CustomException.ResourceConflictException;
-import com.api.kanban.CustomException.ResourceNotFound;
 import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Users;
@@ -12,13 +11,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -64,7 +63,7 @@ public class UsersService {
     }
 
     public Users verifyAccount(VerifyRequest req, String email) {
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("an error occurred. please try again"));
         System.out.println(user.getVerificationCode());
 
         if (!Objects.equals(req.getCode(), user.getVerificationCode())) {
@@ -80,7 +79,7 @@ public class UsersService {
         String token = jwtUtil.extractTokenFromCookie(req);
         String email = jwtUtil.extractEmail(token);
 
-        return usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        return usersRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("an error occurred. please try again"));
     }
 
     // return a list of board objs that contain the title and id for navigation
@@ -95,7 +94,7 @@ public class UsersService {
 
     // return the details for the currently selected board
     public BoardDetailsDTO getCurrentBoard(long id) {
-        Boards b = boardsRepository.findById(id).orElseThrow(() -> new ResourceNotFound("This board could not be found."));
+        Boards b = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("This board could not be found."));
         BoardDetailsDTO board = new BoardDetailsDTO();
 
         // get each column of the board
@@ -122,7 +121,7 @@ public class UsersService {
 
     // regenerate and resend a new verification code
     public void resendNewVerificationCode(ReverifyRequest dto) {
-        Users user = usersRepository.findByEmail(dto.getEmail()).orElseThrow(() -> new UsernameNotFoundException("no user found"));
+        Users user = usersRepository.findByEmail(dto.getEmail()).orElseThrow(() -> new RuntimeException("an error occurred. please try again"));
 
         SecureRandom random = new SecureRandom();
         Integer code = 100000 + random.nextInt(900000);
