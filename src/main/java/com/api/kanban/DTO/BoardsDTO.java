@@ -9,5 +9,4 @@ import java.util.List;
 public class BoardsDTO {
     private String boardTitle;
     private String description;
-    private List<Columns> columns;
 }

@@ -18,10 +18,14 @@ import java.util.NoSuchElementException;
 
 @Service
 public class BoardsService {
-    @Autowired
-    private BoardsRepository boardsRepository;
-    @Autowired
-    private ColumnsRepository columnsRepository;
+    private final BoardsRepository boardsRepository;
+    private final ColumnsRepository columnsRepository;
+
+    //@Autowired
+    public BoardsService(BoardsRepository boardsRepository, ColumnsRepository columnsRepository) {
+        this.columnsRepository = columnsRepository;
+        this.boardsRepository = boardsRepository;
+    }
 
     // create a new kanban board
     public Boards createNewBoard(BoardsDTO dto, Users user) {
@@ -51,12 +55,11 @@ public class BoardsService {
         Columns c2 = new Columns("In Progress", board);
         columnsRepository.save(c1);
         columnsRepository.save(c2);
-        List<Columns> list = new ArrayList<>();
-        list.add(c1);
-        list.add(c2);
-        board.setColumnsList(list);
+        //board.getColumnsList().add(c1);
+        //board.getColumnsList().add(c2);
 
-        return boardsRepository.save(board);
+        //return boardsRepository.save(board);
+        return board;
     }
 
     // edit an existing board

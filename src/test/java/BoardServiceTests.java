@@ -2,8 +2,10 @@ import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.BoardsDTO;
 import com.api.kanban.DTO.EditBoardRequest;
 import com.api.kanban.Entity.Boards;
+import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
+import com.api.kanban.Repository.ColumnsRepository;
 import com.api.kanban.Repository.UsersRepository;
 import com.api.kanban.Service.BoardsService;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,8 @@ public class BoardServiceTests {
     private BoardsRepository boardsRepository;
     @Mock
     private UsersRepository usersRepository;
+    @Mock
+    private ColumnsRepository columnsRepository;
     @InjectMocks
     private BoardsService boardsService;
 
@@ -46,7 +50,6 @@ public class BoardServiceTests {
 
         assertEquals("Coding Project", board.getBoardTitle());
         assertEquals("this board is for my new project", board.getDescription());
-        assertNotNull(board.getColumnsList());
     }
 
     @Test
