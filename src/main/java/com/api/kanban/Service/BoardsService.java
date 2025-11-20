@@ -79,10 +79,7 @@ public class BoardsService {
     }
 
     // delete existing board
-    public void deleteBoard(ConfirmDeleteDTO dto, long id) {
-        if (!dto.isConfirm()) {
-            return;
-        }
+    public void deleteBoard(long id) {
         boardsRepository.deleteById(id);
     }
 }

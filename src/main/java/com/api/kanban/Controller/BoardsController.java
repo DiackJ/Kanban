@@ -43,8 +43,8 @@ public class BoardsController {
     }
 
     @PostMapping("/api/v1/board/{id}")
-    public ResponseEntity<?> deleteBoard(@RequestBody ConfirmDeleteDTO dto, @PathVariable long id) {
-        boardsService.deleteBoard(dto, id);
+    public ResponseEntity<?> deleteBoard(@PathVariable long id) {
+        boardsService.deleteBoard(id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
