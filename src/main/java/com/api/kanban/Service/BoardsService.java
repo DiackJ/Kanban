@@ -55,16 +55,17 @@ public class BoardsService {
         Columns c2 = new Columns("In Progress", board);
         columnsRepository.save(c1);
         columnsRepository.save(c2);
-        //board.getColumnsList().add(c1);
-        //board.getColumnsList().add(c2);
 
-        //return boardsRepository.save(board);
         return board;
     }
 
     // edit an existing board
     public Boards editBoard(EditBoardRequest dto, long id) {
         Boards board = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("board not found"));
+
+        if (board.getBoardTitle().equalsIgnoreCase(dto.getBoardTitle())) {
+            throw new ResourceConflictException("a board with this title already exists");
+        }
 
         if (dto.getBoardTitle() != null) {
             board.setBoardTitle(dto.getBoardTitle());
