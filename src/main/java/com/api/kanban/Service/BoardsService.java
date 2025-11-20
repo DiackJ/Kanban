@@ -2,15 +2,12 @@ package com.api.kanban.Service;
 
 import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.BoardsDTO;
-import com.api.kanban.DTO.ConfirmDeleteDTO;
 import com.api.kanban.DTO.EditBoardRequest;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
 import com.api.kanban.Repository.ColumnsRepository;
-import com.api.kanban.Repository.UsersRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

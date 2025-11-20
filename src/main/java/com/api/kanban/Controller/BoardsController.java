@@ -1,7 +1,6 @@
 package com.api.kanban.Controller;
 
 import com.api.kanban.DTO.BoardsDTO;
-import com.api.kanban.DTO.ConfirmDeleteDTO;
 import com.api.kanban.DTO.EditBoardRequest;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Service.BoardsService;

@@ -1,10 +1,7 @@
 import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.BoardsDTO;
-import com.api.kanban.DTO.ColumnsDTO;
-import com.api.kanban.DTO.ConfirmDeleteDTO;
 import com.api.kanban.DTO.EditBoardRequest;
 import com.api.kanban.Entity.Boards;
-import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
 import com.api.kanban.Repository.UsersRepository;
@@ -115,24 +112,8 @@ public class BoardServiceTests {
         Boards board = new Boards();
         board.setId(1L);
 
-        ConfirmDeleteDTO dto = new ConfirmDeleteDTO();
-        dto.setConfirm(true);
-
-        boardsService.deleteBoard(dto, 1L);
+        boardsService.deleteBoard(1L);
 
         verify(boardsRepository).deleteById(1L);
-    }
-
-    @Test
-    void deleteBoardWithCancel_shouldNotDeleteBoard() {
-        Boards board = new Boards();
-        board.setId(1L);
-
-        ConfirmDeleteDTO dto = new ConfirmDeleteDTO();
-        dto.setConfirm(false);
-
-        boardsService.deleteBoard(dto, 1L);
-
-        verify(boardsRepository, never()).deleteById(1L);
     }
 }
