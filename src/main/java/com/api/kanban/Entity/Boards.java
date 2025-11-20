@@ -14,10 +14,12 @@ public class Boards {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String boardTitle;
     private String description;
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private Users user;
-    @OneToMany
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Columns> columnsList;
 }

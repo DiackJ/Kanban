@@ -1,6 +1,8 @@
 import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.BoardsDTO;
 import com.api.kanban.DTO.ColumnsDTO;
+import com.api.kanban.DTO.ConfirmDeleteDTO;
+import com.api.kanban.DTO.EditBoardRequest;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
@@ -18,7 +20,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BoardServiceTests {
@@ -67,5 +69,70 @@ public class BoardServiceTests {
         assertThrows(ResourceConflictException.class, () -> {
             boardsService.createNewBoard(dto, user);
         });
+    }
+
+    @Test
+    void editBoard_shouldChangeBoardFields() {
+        Boards board = new Boards();
+        board.setId(1L);
+        board.setBoardTitle("Coding Project");
+        board.setDescription("this is a board for my project");
+        when(boardsRepository.findById(1L)).thenReturn(Optional.of(board));
+        when(boardsRepository.save(any(Boards.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        EditBoardRequest edit = new EditBoardRequest();
+        edit.setBoardTitle("Personal Coding Project");
+        // "boardTitle": "Personal Coding Project",
+        // "description": null
+
+        Boards b = boardsService.editBoard(edit, 1L);
+
+        assertEquals("Personal Coding Project", b.getBoardTitle());
+        assertEquals("this is a board for my project", b.getDescription());
+    }
+
+    @Test
+    void editBoard_shouldKeepOriginalBoardFields() {
+        Boards board = new Boards();
+        board.setId(1L);
+        board.setBoardTitle("Coding Project");
+        board.setDescription("this is a board for my project");
+        when(boardsRepository.findById(1L)).thenReturn(Optional.of(board));
+        when(boardsRepository.save(any(Boards.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        EditBoardRequest edit = new EditBoardRequest();
+        edit.setBoardTitle(null);
+        edit.setDescription(null);
+
+        Boards b = boardsService.editBoard(edit, 1L);
+
+        assertEquals("Coding Project", b.getBoardTitle());
+        assertEquals("this is a board for my project", b.getDescription());
+    }
+
+    @Test
+    void deleteBoard_shouldRemoveBoardFromRepo() {
+        Boards board = new Boards();
+        board.setId(1L);
+
+        ConfirmDeleteDTO dto = new ConfirmDeleteDTO();
+        dto.setConfirm(true);
+
+        boardsService.deleteBoard(dto, 1L);
+
+        verify(boardsRepository).deleteById(1L);
+    }
+
+    @Test
+    void deleteBoardWithCancel_shouldNotDeleteBoard() {
+        Boards board = new Boards();
+        board.setId(1L);
+
+        ConfirmDeleteDTO dto = new ConfirmDeleteDTO();
+        dto.setConfirm(false);
+
+        boardsService.deleteBoard(dto, 1L);
+
+        verify(boardsRepository, never()).deleteById(1L);
     }
 }

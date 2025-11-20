@@ -19,6 +19,6 @@ public class Users {
     private String passwordHash;
     private Integer verificationCode;
     private boolean enabled;
-    @OneToMany
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Boards> boardsList;
 }

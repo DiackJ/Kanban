@@ -12,5 +12,6 @@ public class Subtasks {
     private String subtask_title;
     private boolean isComplete;
     @ManyToOne
+    @JoinColumn(name ="task_id")
     private Tasks task;
 }

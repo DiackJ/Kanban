@@ -1,5 +1,6 @@
 package com.api.kanban.DTO;
 
+import com.api.kanban.Entity.Columns;
 import lombok.Data;
 
 import java.util.List;
@@ -8,5 +9,5 @@ import java.util.List;
 public class BoardsDTO {
     private String boardTitle;
     private String description;
-    private List<ColumnsDTO> columns;
+    private List<Columns> columns;
 }
