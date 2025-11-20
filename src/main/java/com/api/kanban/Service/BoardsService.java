@@ -2,12 +2,12 @@ package com.api.kanban.Service;
 
 import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.BoardsDTO;
+import com.api.kanban.DTO.EditBoardRequest;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
-import com.api.kanban.Repository.UsersRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.api.kanban.Repository.ColumnsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +18,14 @@ import java.util.NoSuchElementException;
 
 @Service
 public class BoardsService {
-    @Autowired
-    private BoardsRepository boardsRepository;
+    private final BoardsRepository boardsRepository;
+    private final ColumnsRepository columnsRepository;
+
+    //@Autowired
+    public BoardsService(BoardsRepository boardsRepository, ColumnsRepository columnsRepository) {
+        this.columnsRepository = columnsRepository;
+        this.boardsRepository = boardsRepository;
+    }
 
     // create a new kanban board
     public Boards createNewBoard(BoardsDTO dto, Users user) {
@@ -31,34 +37,49 @@ public class BoardsService {
         }
          // create new board obj
         Boards board = new Boards();
-        // create adn set default columns
-        Columns defaultColumn1 = new Columns();
-        defaultColumn1.setStatusTitle("To Do");
-        defaultColumn1.setBoard(board);
-        Columns defaultColumn2 = new Columns();
-        defaultColumn2.setStatusTitle("In Progress");
-        defaultColumn2.setBoard(board);
 
-        List<Columns> columnsList = new ArrayList<>();
-        columnsList.add(defaultColumn1);
-        columnsList.add(defaultColumn2);
         // set board details
         board.setBoardTitle(dto.getBoardTitle());
         board.setCreatedAt(LocalDateTime.now());
+        board.setUpdatedAt(LocalDateTime.now());
         board.setUser(user);
-        board.setColumnsList(columnsList);
+
         // only set description if provided by user
         if (dto.getDescription() != null) {
             board.setDescription(dto.getDescription());
         }
+        boardsRepository.save(board);
+
+        // create and set default columns
+        Columns c1 = new Columns("To Do", board);
+        Columns c2 = new Columns("In Progress", board);
+        columnsRepository.save(c1);
+        columnsRepository.save(c2);
+        //board.getColumnsList().add(c1);
+        //board.getColumnsList().add(c2);
+
+        //return boardsRepository.save(board);
+        return board;
+    }
+
+    // edit an existing board
+    public Boards editBoard(EditBoardRequest dto, long id) {
+        Boards board = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("board not found"));
+
+        if (dto.getBoardTitle() != null) {
+            board.setBoardTitle(dto.getBoardTitle());
+        }
+
+        if (dto.getDescription() != null) {
+            board.setDescription(dto.getDescription());
+        }
+        board.setUpdatedAt(LocalDateTime.now());
 
         return boardsRepository.save(board);
     }
 
-    // edit an existing board
-//    public BoardsDTO editBoard(BoardsDTO dto, long id) {
-//        Boards board = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("board not found"));
-//
-//
-//    }
+    // delete existing board
+    public void deleteBoard(long id) {
+        boardsRepository.deleteById(id);
+    }
 }

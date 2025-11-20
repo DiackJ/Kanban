@@ -13,7 +13,15 @@ public class Columns {
     private long id;
     private String statusTitle;
     @ManyToOne
+    @JoinColumn(name ="board_id")
     private Boards board;
-    @OneToMany
+    @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tasks> tasksList;
+
+    public Columns(){}
+
+    public Columns(String statusTitle, Boards board) {
+        this.statusTitle = statusTitle;
+        this.board = board;
+    }
 }

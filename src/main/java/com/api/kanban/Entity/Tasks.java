@@ -16,8 +16,9 @@ public class Tasks {
     private String taskTitle;
     private String description;
     @ManyToOne
+    @JoinColumn(name = "column_id")
     private Columns column;
     private String statusColumn; // = column.getStatusColumn
-    @OneToMany
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Subtasks> subtasksList;
 }
