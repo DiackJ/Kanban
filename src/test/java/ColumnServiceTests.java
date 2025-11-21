@@ -47,7 +47,7 @@ public class ColumnServiceTests {
         Boards board = new Boards();
         when(boardsRepository.findById(1L)).thenReturn(Optional.of(board));
         Columns col = new Columns();
-        when(columnsRepository.findByStatusTitle("Done")).thenReturn(Optional.of(col));
+        when(columnsRepository.findByStatusTitleIgnoreCase("Done")).thenReturn(Optional.of(col));
 
         ColumnsDTO dto = new ColumnsDTO();
         dto.setStatusTitle("Done");
@@ -67,9 +67,9 @@ public class ColumnServiceTests {
         ColumnsDTO dto = new ColumnsDTO();
         dto.setStatusTitle("Urgent");
 
-        Columns c = columnsService.editColumnName(dto, 1L);
+        columnsService.editColumnName(dto, 1L);
 
-        assertEquals("Urgent", c.getStatusTitle());
+        assertEquals("Urgent", col.getStatusTitle());
     }
 
     @Test

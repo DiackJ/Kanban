@@ -21,7 +21,7 @@ public class ColumnsService {
     // add a new column to a board
     public Columns addNewColumn(ColumnsDTO dto, long boardId) {
         Boards board = boardsRepository.findById(boardId).orElseThrow(() -> new NoSuchElementException("board not found"));
-        Columns existingColumn = columnsRepository.findByStatusTitle(dto.getStatusTitle()).orElse(null);
+        Columns existingColumn = columnsRepository.findByStatusTitleIgnoreCase(dto.getStatusTitle()).orElse(null);
 
         if (existingColumn != null) {
             throw new ResourceConflictException("a column with this title already exists");

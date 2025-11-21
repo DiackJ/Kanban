@@ -8,12 +8,9 @@ import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
 import com.api.kanban.Repository.ColumnsRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -30,7 +27,7 @@ public class BoardsService {
     // create a new kanban board
     public Boards createNewBoard(BoardsDTO dto, Users user) {
         // check if a board with input title already exists
-        Boards existingBoard = boardsRepository.findByBoardTitle(dto.getBoardTitle()).orElse(null);
+        Boards existingBoard = boardsRepository.findByBoardTitleIgnoreCase(dto.getBoardTitle()).orElse(null);
 
         if (existingBoard != null) {
             throw new ResourceConflictException("A board with this title already exists.");
