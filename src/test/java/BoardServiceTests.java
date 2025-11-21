@@ -2,7 +2,6 @@ import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.BoardsDTO;
 import com.api.kanban.DTO.EditBoardRequest;
 import com.api.kanban.Entity.Boards;
-import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
 import com.api.kanban.Repository.ColumnsRepository;
@@ -61,7 +60,7 @@ public class BoardServiceTests {
         user.setEmail("test@test.com");
 
         Boards existingBoard = new Boards();
-        when(boardsRepository.findByBoardTitle("Coding Project")).thenReturn(Optional.of(existingBoard));
+        when(boardsRepository.findByBoardTitleIgnoreCase("Coding Project")).thenReturn(Optional.of(existingBoard));
 
         BoardsDTO dto = new BoardsDTO();
         dto.setBoardTitle("Coding Project");
@@ -85,10 +84,10 @@ public class BoardServiceTests {
         // "boardTitle": "Personal Coding Project",
         // "description": null
 
-        Boards b = boardsService.editBoard(edit, 1L);
+        boardsService.editBoard(edit, 1L);
 
-        assertEquals("Personal Coding Project", b.getBoardTitle());
-        assertEquals("this is a board for my project", b.getDescription());
+        assertEquals("Personal Coding Project", board.getBoardTitle());
+        assertEquals("this is a board for my project", board.getDescription());
     }
 
     @Test
@@ -104,10 +103,10 @@ public class BoardServiceTests {
         edit.setBoardTitle(null);
         edit.setDescription(null);
 
-        Boards b = boardsService.editBoard(edit, 1L);
+        boardsService.editBoard(edit, 1L);
 
-        assertEquals("Coding Project", b.getBoardTitle());
-        assertEquals("this is a board for my project", b.getDescription());
+        assertEquals("Coding Project", board.getBoardTitle());
+        assertEquals("this is a board for my project", board.getDescription());
     }
 
     @Test

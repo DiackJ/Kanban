@@ -13,6 +13,7 @@ public class Tasks {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String taskTitle;
     private String description;
     @ManyToOne
