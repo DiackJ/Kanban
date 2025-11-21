@@ -9,7 +9,7 @@ public class Subtasks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String subtask_title;
+    private String subtaskTitle;
     private boolean isComplete;
     @ManyToOne
     @JoinColumn(name ="task_id")
