@@ -1,6 +1,7 @@
 import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.BoardsDTO;
 import com.api.kanban.DTO.EditBoardRequest;
+import com.api.kanban.DTO.GetBoardDetailsDTO;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
@@ -45,7 +46,7 @@ public class BoardServiceTests {
         dto.setBoardTitle("Coding Project");
         dto.setDescription("this board is for my new project");
 
-        Boards board = boardsService.createNewBoard(dto, user);
+        GetBoardDetailsDTO board = boardsService.createNewBoard(dto, user);
 
         assertEquals("Coding Project", board.getBoardTitle());
         assertEquals("this board is for my new project", board.getDescription());

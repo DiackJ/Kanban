@@ -1,0 +1,28 @@
+package com.api.kanban.DTO;
+
+import lombok.Data;
+
+import java.util.List;
+import java.util.UUID;
+// when a board is selected to view
+@Data
+public class GetBoardDetailsDTO {
+    private long id;
+    private String boardTitle;
+    private String description;
+    private UUID userId;
+    private List<ColumnsDetailsDTO> columnsList;
+
+    public GetBoardDetailsDTO() {}
+    public GetBoardDetailsDTO(long id, String title, String desc, UUID userId) {
+        this.id = id;
+        this.boardTitle = title;
+        this.description = desc;
+        this.userId = userId;
+    }
+    public GetBoardDetailsDTO(long id, String title, String desc) {
+        this.id = id;
+        this.boardTitle = title;
+        this.description = desc;
+    }
+}

@@ -3,6 +3,7 @@ package com.api.kanban.Service;
 import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.BoardsDTO;
 import com.api.kanban.DTO.EditBoardRequest;
+import com.api.kanban.DTO.GetBoardDetailsDTO;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
@@ -25,7 +26,7 @@ public class BoardsService {
     }
 
     // create a new kanban board
-    public Boards createNewBoard(BoardsDTO dto, Users user) {
+    public GetBoardDetailsDTO createNewBoard(BoardsDTO dto, Users user) {
         // check if a board with input title already exists
         Boards existingBoard = boardsRepository.findByBoardTitleIgnoreCase(dto.getBoardTitle()).orElse(null);
 
@@ -53,11 +54,16 @@ public class BoardsService {
         columnsRepository.save(c1);
         columnsRepository.save(c2);
 
-        return board;
+        return new GetBoardDetailsDTO(
+                board.getId(),
+                board.getBoardTitle(),
+                board.getDescription(),
+                board.getUser().getId()
+        );
     }
 
     // edit an existing board
-    public Boards editBoard(EditBoardRequest dto, long id) {
+    public GetBoardDetailsDTO editBoard(EditBoardRequest dto, long id) {
         Boards board = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("board not found"));
 
         if (board.getBoardTitle().equalsIgnoreCase(dto.getBoardTitle())) {
@@ -73,7 +79,13 @@ public class BoardsService {
         }
         board.setUpdatedAt(LocalDateTime.now());
 
-        return boardsRepository.save(board);
+        boardsRepository.save(board);
+
+        return new GetBoardDetailsDTO(
+                board.getId(),
+                board.getBoardTitle(),
+                board.getDescription()
+        );
     }
 
     // delete existing board

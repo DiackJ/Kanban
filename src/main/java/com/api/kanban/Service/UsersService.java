@@ -5,6 +5,7 @@ import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
+import com.api.kanban.Repository.SubtasksRepository;
 import com.api.kanban.Repository.UsersRepository;
 import com.api.kanban.Util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,8 @@ public class UsersService {
     private JwtUtil jwtUtil;
     @Autowired
     private BoardsRepository boardsRepository;
+    @Autowired
+    private SubtasksRepository subtasksRepository;
 
     // add a new user
     public Users addNewUser(SignupRequest dto) {
@@ -93,28 +96,30 @@ public class UsersService {
     }
 
     // return the details for the currently selected board
-    public BoardDetailsDTO getCurrentBoard(long id) {
+    public GetBoardDetailsDTO getCurrentBoard(long id) {
         Boards b = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("This board could not be found."));
-        BoardDetailsDTO board = new BoardDetailsDTO();
+        GetBoardDetailsDTO board = new GetBoardDetailsDTO();
 
         // get each column of the board
-        List<GetColumnsDTO> c = b.getColumnsList().stream().map(col -> {
-            GetColumnsDTO dto = new GetColumnsDTO();
+        List<ColumnsDetailsDTO> c = b.getColumnsList().stream().map(col -> {
+            ColumnsDetailsDTO dto = new ColumnsDetailsDTO();
             dto.setId(col.getId());
             dto.setStatusTitle(col.getStatusTitle());
 
             // for each column get each task list
-            List<GetTasksDTO> tasks = col.getTasksList().stream().map(t -> new GetTasksDTO(
+            List<TasksDetailsDTO> tasks = col.getTasksList().stream().map(t -> new TasksDetailsDTO(
                     t.getId(),
-                    t.getTaskTitle()
+                    t.getTaskTitle(),
+                    subtasksRepository.findIsComplete(true).size(),
+                    subtasksRepository.findIsComplete(false).size()
             )).toList();
 
-            dto.setTasks(tasks);
+            dto.setTasksList(tasks);
             return dto;
         }).toList();
 
         board.setBoardTitle(b.getBoardTitle());
-        board.setColumns(c);
+        board.setColumnsList(c);
 
         return board;
     }
