@@ -2,6 +2,7 @@ package com.api.kanban.Controller;
 
 import com.api.kanban.DTO.BoardsDTO;
 import com.api.kanban.DTO.EditBoardRequest;
+import com.api.kanban.DTO.GetBoardDetailsDTO;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Service.BoardsService;
 import com.api.kanban.Service.UsersService;
@@ -22,23 +23,23 @@ public class BoardsController {
     private UsersService usersService;
 
     @PostMapping("/api/v1/board")
-    public ResponseEntity<BoardsDTO> createNewBoard(@RequestBody BoardsDTO dto, HttpServletRequest req) {
+    public ResponseEntity<GetBoardDetailsDTO> createNewBoard(@RequestBody BoardsDTO dto, HttpServletRequest req) {
         Users user = usersService.getUser(req);
 
-        boardsService.createNewBoard(dto, user);
+        GetBoardDetailsDTO res = boardsService.createNewBoard(dto, user);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(dto);
+                .body(res);
     }
 
     @PostMapping("/api/v1/{id}/board")
-    public ResponseEntity<?> editBoard(@RequestBody EditBoardRequest dto, @PathVariable long id) {
-        boardsService.editBoard(dto, id);
+    public ResponseEntity<GetBoardDetailsDTO> editBoard(@RequestBody EditBoardRequest dto, @PathVariable long id) {
+        GetBoardDetailsDTO res = boardsService.editBoard(dto, id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(null);
+                .body(res);
     }
 
     @PostMapping("/api/v1/board/{id}")

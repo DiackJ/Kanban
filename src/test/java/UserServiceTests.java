@@ -3,7 +3,6 @@ import com.api.kanban.DTO.SignupRequest;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.UsersRepository;
 import com.api.kanban.Service.UsersService;
-import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

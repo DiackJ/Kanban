@@ -129,8 +129,8 @@ public class UsersController {
 
     // make request to get the currently selected board's details
     @GetMapping("api/v1/board/{id}")
-    public ResponseEntity<BoardDetailsDTO> getBoardDetails(@PathVariable long id) {
-        BoardDetailsDTO details = usersService.getCurrentBoard(id);
+    public ResponseEntity<GetBoardDetailsDTO> getBoardDetails(@PathVariable long id) {
+        GetBoardDetailsDTO details = usersService.getCurrentBoard(id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

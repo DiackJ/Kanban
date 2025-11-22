@@ -2,6 +2,7 @@ package com.api.kanban.Service;
 
 import com.api.kanban.DTO.IsCompleteDTO;
 import com.api.kanban.DTO.SubtasksDTO;
+import com.api.kanban.DTO.SubtasksDetailsDTO;
 import com.api.kanban.Entity.Subtasks;
 import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Repository.SubtasksRepository;
@@ -18,7 +19,7 @@ public class SubtasksService {
     @Autowired
     private TasksRepository tasksRepository;
 
-    public Subtasks addNewSubtask(SubtasksDTO dto, long taskId) {
+    public SubtasksDetailsDTO addNewSubtask(SubtasksDTO dto, long taskId) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
 
         Subtasks st = new Subtasks();
@@ -27,16 +28,26 @@ public class SubtasksService {
         st.setComplete(false);
 
         subtasksRepository.save(st);
-        return st;
+        return new SubtasksDetailsDTO(
+                st.getId(),
+                st.getSubtaskTitle(),
+                st.isComplete(),
+                st.getTask().getId()
+        );
     }
 
-    public Subtasks editSubtask(SubtasksDTO dto, long id) {
+    public SubtasksDetailsDTO editSubtask(SubtasksDTO dto, long id) {
         Subtasks st = subtasksRepository.findById(id).orElseThrow(() -> new NoSuchElementException("subtask not found"));
 
         st.setSubtaskTitle(dto.getSubtaskTitle());
 
         subtasksRepository.save(st);
-        return st;
+        return new SubtasksDetailsDTO(
+                st.getId(),
+                st.getSubtaskTitle(),
+                st.isComplete(),
+                st.getTask().getId()
+        );
     }
 
     public void markAsComplete(IsCompleteDTO dto, long id) {
