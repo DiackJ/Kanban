@@ -39,6 +39,7 @@ public class BoardServiceTests {
         user.setId(id);
         user.setEnabled(true);
         user.setEmail("test@test.com");
+        when(usersRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         when(boardsRepository.save(any(Boards.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -59,6 +60,7 @@ public class BoardServiceTests {
         user.setId(id);
         user.setEnabled(true);
         user.setEmail("test@test.com");
+        when(usersRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         Boards existingBoard = new Boards();
         when(boardsRepository.findByBoardTitleIgnoreCase("Coding Project", user.getId())).thenReturn(Optional.of(existingBoard));

@@ -15,7 +15,6 @@ public class TasksController {
     private TasksService tasksService;
 
     // request to create a new task
-    // not adding description
     @PostMapping("/api/v1/column/{columnId}/task")
     public ResponseEntity<TasksDetailsDTO> createNewTask(@RequestBody TasksDTO dto, @PathVariable long columnId) {
         if (dto.getTaskTitle().isEmpty()) {
@@ -29,7 +28,6 @@ public class TasksController {
     }
 
     // request to edit a task
-    // able to edit title but not description
     @PutMapping("/api/v1/task/{id}")
     public ResponseEntity<TasksDetailsDTO> editTask(@RequestBody TasksDTO dto, @PathVariable long id) {
         TasksDetailsDTO task = tasksService.editTask(dto, id);
@@ -38,7 +36,7 @@ public class TasksController {
                 .status(HttpStatus.OK)
                 .body(task);
     }
-// good
+
     @PatchMapping("/api/v1/task/{id}/position")
     public ResponseEntity<TasksDetailsDTO> moveTask(@RequestBody MoveTaskRequest dto, @PathVariable long id) {
         TasksDetailsDTO task = tasksService.moveTask(dto, id);
@@ -47,7 +45,7 @@ public class TasksController {
                 .status(HttpStatus.OK)
                 .body(task);
     }
-// no columnId
+
     @GetMapping("/api/v1/task/{id}")
     public ResponseEntity<TasksDetailsDTO> getTask(@PathVariable long id) {
         TasksDetailsDTO task = tasksService.getTasks(id);
@@ -56,7 +54,7 @@ public class TasksController {
                 .status(HttpStatus.OK)
                 .body(task);
     }
-// good
+
     @DeleteMapping("/api/v1/task/{id}")
     public ResponseEntity<?> deleteTask(@PathVariable long id) {
         tasksService.deleteTask(id);

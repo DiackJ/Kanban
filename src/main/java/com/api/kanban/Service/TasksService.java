@@ -23,6 +23,7 @@ public class TasksService {
     @Autowired
     private SubtasksRepository subtasksRepository;
 
+    // fix ignore case logic
     public TasksDetailsDTO createNewTask(TasksDTO dto, long columnId) {
         Columns col = columnsRepository.findById(columnId).orElseThrow(() -> new NoSuchElementException("column not found"));
         Tasks existingTask = tasksRepository.findByTaskTitleIgnoreCase(dto.getTaskTitle(), col.getBoard().getId()).orElse(null);

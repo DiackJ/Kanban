@@ -21,7 +21,7 @@ public class BoardsController {
     @Autowired
     private UsersService usersService;
 
-    // fix
+
     @PostMapping("/api/v1/board")
     public ResponseEntity<GetBoardDetailsDTO> createNewBoard(@RequestBody BoardsDTO dto, HttpServletRequest req) {
         Users user = usersService.getUser(req);
@@ -32,7 +32,7 @@ public class BoardsController {
                 .status(HttpStatus.CREATED)
                 .body(res);
     }
-// good
+
     @PutMapping("/api/v1/board/{id}")
     public ResponseEntity<GetBoardDetailsDTO> editBoard(@RequestBody EditBoardRequest dto, @PathVariable long id) {
         GetBoardDetailsDTO res = boardsService.editBoard(dto, id);
@@ -41,7 +41,7 @@ public class BoardsController {
                 .status(HttpStatus.OK)
                 .body(res);
     }
-// good
+
     @DeleteMapping("/api/v1/board/{id}")
     public ResponseEntity<?> deleteBoard(@PathVariable long id) {
         boardsService.deleteBoard(id);

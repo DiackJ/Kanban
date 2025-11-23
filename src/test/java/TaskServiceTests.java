@@ -18,8 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +33,10 @@ public class TaskServiceTests {
 
     @Test
     void createNewTask_shouldCreateANewTask() {
+        Boards board = new Boards();
+        board.setId(1L);
         Columns col = new Columns();
+        col.setBoard(board);
         when(columnsRepository.findById(1L)).thenReturn(Optional.of(col));
         when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -55,7 +58,8 @@ public class TaskServiceTests {
         Columns c = new Columns();
         c.setBoard(board);
         when(columnsRepository.findById(1L)).thenReturn(Optional.of(c));
-        when(tasksRepository.findByTaskTitleIgnoreCase(argThat(s -> s.equalsIgnoreCase(t.getTaskTitle())), board.getId())).thenReturn(Optional.of(t));
+        // eq() tells mockito that this arg should equal exactly this value
+        when(tasksRepository.findByTaskTitleIgnoreCase(argThat(s -> s.equalsIgnoreCase(t.getTaskTitle())), eq(1L))).thenReturn(Optional.of(t));
 
         TasksDTO dto = new TasksDTO();
         dto.setTaskTitle("Implement Backend");
