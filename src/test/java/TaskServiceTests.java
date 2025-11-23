@@ -1,7 +1,9 @@
 import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.ColumnsDTO;
+import com.api.kanban.DTO.MoveTaskRequest;
 import com.api.kanban.DTO.TasksDTO;
 import com.api.kanban.DTO.TasksDetailsDTO;
+import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Entity.Columns;
 import com.api.kanban.Repository.ColumnsRepository;
@@ -48,9 +50,12 @@ public class TaskServiceTests {
     void createDupeTask_shouldThrowConflictException() throws ResourceConflictException {
         Tasks t = new Tasks();
         t.setTaskTitle("implement backend");
+        Boards board = new Boards();
+        board.setId(1L);
         Columns c = new Columns();
+        c.setBoard(board);
         when(columnsRepository.findById(1L)).thenReturn(Optional.of(c));
-        when(tasksRepository.findTasksByTaskTitleIgnoreCase(argThat(s -> s.equalsIgnoreCase(t.getTaskTitle())))).thenReturn(Optional.of(t));
+        when(tasksRepository.findByTaskTitleIgnoreCase(argThat(s -> s.equalsIgnoreCase(t.getTaskTitle())), board.getId())).thenReturn(Optional.of(t));
 
         TasksDTO dto = new TasksDTO();
         dto.setTaskTitle("Implement Backend");
@@ -92,35 +97,37 @@ public class TaskServiceTests {
         when(tasksRepository.findById(1L)).thenReturn(Optional.of(t));
         when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        tasksService.moveTask(2L, 1L);
+        MoveTaskRequest req = new MoveTaskRequest();
+        req.setColumnId(2L);
+        tasksService.moveTask(req, 1L);
 
         assertEquals(newCol, t.getColumn()); // check that task col got updated (task moved)
         assertEquals("In Progress", t.getStatusColumn()); // check that status was updated to new col status
     }
 
-    @Test
-    void updateTaskStatus_shouldMoveTask() {
-        // current col
-        Columns oldCol = new Columns();
-        // task to move
-        Tasks t = new Tasks();
-        t.setStatusColumn("To Do");
-        t.setColumn(oldCol);
-        // new col to move task to
-        Columns newCol = new Columns();
-        newCol.setStatusTitle("In Progress");
-        // locate new col
-        when(columnsRepository.findByStatusTitleIgnoreCase(newCol.getStatusTitle())).thenReturn(Optional.of(newCol));
-        // get and save task
-        when(tasksRepository.findById(1L)).thenReturn(Optional.of(t));
-        when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        ColumnsDTO dto = new ColumnsDTO();
-        dto.setStatusTitle("In Progress");
-
-        tasksService.updateTaskStatus(dto, 1L);
-
-        assertEquals(newCol, t.getColumn()); // check task was moved
-        assertEquals("In Progress", t.getStatusColumn()); // check status was updated
-    }
+//    @Test
+//    void updateTaskStatus_shouldMoveTask() {
+//        // current col
+//        Columns oldCol = new Columns();
+//        // task to move
+//        Tasks t = new Tasks();
+//        t.setStatusColumn("To Do");
+//        t.setColumn(oldCol);
+//        // new col to move task to
+//        Columns newCol = new Columns();
+//        newCol.setStatusTitle("In Progress");
+//        // locate new col
+//        when(columnsRepository.findByStatusTitleIgnoreCase(newCol.getStatusTitle())).thenReturn(Optional.of(newCol));
+//        // get and save task
+//        when(tasksRepository.findById(1L)).thenReturn(Optional.of(t));
+//        when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
+//
+//        ColumnsDTO dto = new ColumnsDTO();
+//        dto.setStatusTitle("In Progress");
+//
+//        tasksService.updateTaskStatus(dto, 1L);
+//
+//        assertEquals(newCol, t.getColumn()); // check task was moved
+//        assertEquals("In Progress", t.getStatusColumn()); // check status was updated
+//    }
 }

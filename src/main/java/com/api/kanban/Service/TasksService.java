@@ -1,10 +1,7 @@
 package com.api.kanban.Service;
 
 import com.api.kanban.CustomException.ResourceConflictException;
-import com.api.kanban.DTO.ColumnsDTO;
-import com.api.kanban.DTO.SubtasksDetailsDTO;
-import com.api.kanban.DTO.TasksDTO;
-import com.api.kanban.DTO.TasksDetailsDTO;
+import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Entity.Columns;
 import com.api.kanban.Repository.ColumnsRepository;
@@ -14,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -29,7 +25,7 @@ public class TasksService {
 
     public TasksDetailsDTO createNewTask(TasksDTO dto, long columnId) {
         Columns col = columnsRepository.findById(columnId).orElseThrow(() -> new NoSuchElementException("column not found"));
-        Tasks existingTask = tasksRepository.findTasksByTaskTitleIgnoreCase(dto.getTaskTitle()).orElse(null);
+        Tasks existingTask = tasksRepository.findByTaskTitleIgnoreCase(dto.getTaskTitle(), col.getBoard().getId()).orElse(null);
 
         if (existingTask != null) {
             throw new ResourceConflictException("a task with this title already exists");
@@ -42,7 +38,7 @@ public class TasksService {
         task.setColumn(col);
         task.setStatusColumn(col.getStatusTitle());
 
-        if (dto.getDescription() != null) {
+        if(dto.getDescription() != null) {
             task.setDescription(dto.getDescription());
         }
 
@@ -69,13 +65,14 @@ public class TasksService {
         tasksRepository.save(task);
         return new TasksDetailsDTO(
                 task.getId(),
-                task.getTaskTitle()
+                task.getTaskTitle(),
+                task.getDescription()
         );
     }
  // move a task by drag & drop. find col by id of col task was dropped into and update accordingly
-    public TasksDetailsDTO moveTask(long columnId, long taskId) {
+    public TasksDetailsDTO moveTask(MoveTaskRequest columnId, long taskId) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
-        Columns column = columnsRepository.findById(columnId).orElseThrow(() -> new NoSuchElementException("column not found"));
+        Columns column = columnsRepository.findById((columnId.getColumnId())).orElseThrow(() -> new NoSuchElementException("column not found"));
 
         task.setStatusColumn(column.getStatusTitle());
         task.setColumn(column);
@@ -90,22 +87,22 @@ public class TasksService {
         );
     }
 // move a task by updating status. user inputs status and if exists as col, update accordingly to move task into col
-    public TasksDetailsDTO updateTaskStatus(ColumnsDTO status, long taskId) {
-        Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
-        Columns column = columnsRepository.findByStatusTitleIgnoreCase(status.getStatusTitle()).orElseThrow(() -> new NoSuchElementException("column not found"));
-
-        task.setUpdatedAt(LocalDateTime.now());
-        task.setStatusColumn(column.getStatusTitle());
-        task.setColumn(column);
-
-        tasksRepository.save(task);
-        return new TasksDetailsDTO(
-                task.getId(),
-                task.getTaskTitle(),
-                task.getStatusColumn(),
-                task.getColumn().getId()
-        );
-    }
+//    public TasksDetailsDTO updateTaskStatus(ColumnsDTO status, long taskId) {
+//        Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
+//        Columns column = columnsRepository.findByStatusTitleIgnoreCase(status.getStatusTitle()).orElseThrow(() -> new NoSuchElementException("column not found"));
+//
+//        task.setUpdatedAt(LocalDateTime.now());
+//        task.setStatusColumn(column.getStatusTitle());
+//        task.setColumn(column);
+//
+//        tasksRepository.save(task);
+//        return new TasksDetailsDTO(
+//                task.getId(),
+//                task.getTaskTitle(),
+//                task.getStatusColumn(),
+//                task.getColumn().getId()
+//        );
+//    }
 
     public TasksDetailsDTO getTasks(long id) {
         Tasks task = tasksRepository.findById(id).orElseThrow(() -> new NoSuchElementException("task not found"));
@@ -117,16 +114,18 @@ public class TasksService {
                 st.getTask().getId()
         )).toList();
 
-        int completedTasks = subtasksRepository.findIsComplete(true).size();
-        int incompleteTasks = subtasksRepository.findIsComplete(false).size();
+        int completedTasks = subtasksRepository.findIsComplete(true, task.getId()).size();
+        int incompleteTasks = subtasksRepository.findIsComplete(false, task.getId()).size();
 
         return new TasksDetailsDTO(
                 task.getId(),
                 task.getTaskTitle(),
+                task.getDescription(),
                 task.getStatusColumn(),
                 completedTasks,
                 incompleteTasks,
-                subtasks
+                subtasks,
+                task.getColumn().getId()
         );
     }
 

@@ -48,7 +48,7 @@ public class ColumnServiceTests {
         Boards board = new Boards();
         when(boardsRepository.findById(1L)).thenReturn(Optional.of(board));
         Columns col = new Columns();
-        when(columnsRepository.findByStatusTitleIgnoreCase("Done")).thenReturn(Optional.of(col));
+        when(columnsRepository.findByStatusTitleIgnoreCase("Done", 1L)).thenReturn(Optional.of(col));
 
         ColumnsDTO dto = new ColumnsDTO();
         dto.setStatusTitle("Done");

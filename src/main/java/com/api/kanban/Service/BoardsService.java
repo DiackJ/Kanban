@@ -9,26 +9,31 @@ import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.BoardsRepository;
 import com.api.kanban.Repository.ColumnsRepository;
+import com.api.kanban.Repository.UsersRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 public class BoardsService {
+    private final UsersRepository usersRepository;
     private final BoardsRepository boardsRepository;
     private final ColumnsRepository columnsRepository;
 
     //@Autowired
-    public BoardsService(BoardsRepository boardsRepository, ColumnsRepository columnsRepository) {
+    public BoardsService(BoardsRepository boardsRepository, ColumnsRepository columnsRepository, UsersRepository usersRepository) {
         this.columnsRepository = columnsRepository;
         this.boardsRepository = boardsRepository;
+        this.usersRepository = usersRepository;
     }
 
     // create a new kanban board
-    public GetBoardDetailsDTO createNewBoard(BoardsDTO dto, Users user) {
+    public GetBoardDetailsDTO createNewBoard(BoardsDTO dto, UUID userId) {
+        Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("an error occurred. please try again"));
         // check if a board with input title already exists
-        Boards existingBoard = boardsRepository.findByBoardTitleIgnoreCase(dto.getBoardTitle()).orElse(null);
+        Boards existingBoard = boardsRepository.findByBoardTitleIgnoreCase(dto.getBoardTitle(), user.getId()).orElse(null);
 
         if (existingBoard != null) {
             throw new ResourceConflictException("A board with this title already exists.");

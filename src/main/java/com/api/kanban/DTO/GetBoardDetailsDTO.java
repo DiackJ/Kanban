@@ -14,6 +14,13 @@ public class GetBoardDetailsDTO {
     private List<ColumnsDetailsDTO> columnsList;
 
     public GetBoardDetailsDTO() {}
+    public GetBoardDetailsDTO(long id, String title, String desc, UUID userId, List<ColumnsDetailsDTO> colList) {
+        this.id = id;
+        this.boardTitle = title;
+        this.description = desc;
+        this.userId = userId;
+        this.columnsList = colList;
+    }
     public GetBoardDetailsDTO(long id, String title, String desc, UUID userId) {
         this.id = id;
         this.boardTitle = title;

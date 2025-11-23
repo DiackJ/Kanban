@@ -10,10 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 public class BoardsController {
@@ -22,18 +21,19 @@ public class BoardsController {
     @Autowired
     private UsersService usersService;
 
+    // fix
     @PostMapping("/api/v1/board")
     public ResponseEntity<GetBoardDetailsDTO> createNewBoard(@RequestBody BoardsDTO dto, HttpServletRequest req) {
         Users user = usersService.getUser(req);
 
-        GetBoardDetailsDTO res = boardsService.createNewBoard(dto, user);
+        GetBoardDetailsDTO res = boardsService.createNewBoard(dto, user.getId());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(res);
     }
-
-    @PostMapping("/api/v1/{id}/board")
+// good
+    @PutMapping("/api/v1/board/{id}")
     public ResponseEntity<GetBoardDetailsDTO> editBoard(@RequestBody EditBoardRequest dto, @PathVariable long id) {
         GetBoardDetailsDTO res = boardsService.editBoard(dto, id);
 
@@ -41,8 +41,8 @@ public class BoardsController {
                 .status(HttpStatus.OK)
                 .body(res);
     }
-
-    @PostMapping("/api/v1/board/{id}")
+// good
+    @DeleteMapping("/api/v1/board/{id}")
     public ResponseEntity<?> deleteBoard(@PathVariable long id) {
         boardsService.deleteBoard(id);
 

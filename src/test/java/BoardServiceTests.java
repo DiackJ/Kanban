@@ -46,7 +46,7 @@ public class BoardServiceTests {
         dto.setBoardTitle("Coding Project");
         dto.setDescription("this board is for my new project");
 
-        GetBoardDetailsDTO board = boardsService.createNewBoard(dto, user);
+        GetBoardDetailsDTO board = boardsService.createNewBoard(dto, user.getId());
 
         assertEquals("Coding Project", board.getBoardTitle());
         assertEquals("this board is for my new project", board.getDescription());
@@ -61,13 +61,13 @@ public class BoardServiceTests {
         user.setEmail("test@test.com");
 
         Boards existingBoard = new Boards();
-        when(boardsRepository.findByBoardTitleIgnoreCase("Coding Project")).thenReturn(Optional.of(existingBoard));
+        when(boardsRepository.findByBoardTitleIgnoreCase("Coding Project", user.getId())).thenReturn(Optional.of(existingBoard));
 
         BoardsDTO dto = new BoardsDTO();
         dto.setBoardTitle("Coding Project");
 
         assertThrows(ResourceConflictException.class, () -> {
-            boardsService.createNewBoard(dto, user);
+            boardsService.createNewBoard(dto, user.getId());
         });
     }
 

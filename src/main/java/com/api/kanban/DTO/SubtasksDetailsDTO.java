@@ -10,10 +10,10 @@ public class SubtasksDetailsDTO {
     private long taskId;
 
     public SubtasksDetailsDTO() {}
-    public SubtasksDetailsDTO(long id, String title, boolean complete, long taskId) {
+    public SubtasksDetailsDTO(long id, String subtaskTitle, boolean isComplete, long taskId) {
         this.id = id;
-        this.subtaskTitle = title;
-        this.isComplete = complete;
+        this.subtaskTitle = subtaskTitle;
+        this.isComplete = isComplete;
         this.taskId = taskId;
     }
 }
