@@ -98,10 +98,10 @@ public class UsersService {
     // return the details for the currently selected board
     public GetBoardDetailsDTO getCurrentBoard(long id) {
         Boards b = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("This board could not be found."));
-        GetBoardDetailsDTO board = new GetBoardDetailsDTO();
+        //GetBoardDetailsDTO board = new GetBoardDetailsDTO();
 
         // get each column of the board
-        List<ColumnsDetailsDTO> c = b.getColumnsList().stream().map(col -> {
+        List<ColumnsDetailsDTO> colList = b.getColumnsList().stream().map(col -> {
             ColumnsDetailsDTO dto = new ColumnsDetailsDTO();
             dto.setId(col.getId());
             dto.setStatusTitle(col.getStatusTitle());
@@ -110,18 +110,24 @@ public class UsersService {
             List<TasksDetailsDTO> tasks = col.getTasksList().stream().map(t -> new TasksDetailsDTO(
                     t.getId(),
                     t.getTaskTitle(),
-                    subtasksRepository.findIsComplete(true).size(),
-                    subtasksRepository.findIsComplete(false).size()
+                    subtasksRepository.findIsComplete(true, t.getId()).size(),
+                    subtasksRepository.findIsComplete(false, t.getId()).size()
             )).toList();
 
             dto.setTasksList(tasks);
             return dto;
         }).toList();
 
-        board.setBoardTitle(b.getBoardTitle());
-        board.setColumnsList(c);
+       // board.setBoardTitle(b.getBoardTitle());
+        //board.setColumnsList(c);
 
-        return board;
+        return new GetBoardDetailsDTO(
+                b.getId(),
+                b.getBoardTitle(),
+                b.getDescription(),
+                b.getUser().getId(),
+                colList
+        );
     }
 
     // regenerate and resend a new verification code

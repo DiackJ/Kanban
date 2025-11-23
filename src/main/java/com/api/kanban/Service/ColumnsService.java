@@ -22,7 +22,7 @@ public class ColumnsService {
     // add a new column to a board
     public ColumnsDetailsDTO addNewColumn(ColumnsDTO dto, long boardId) {
         Boards board = boardsRepository.findById(boardId).orElseThrow(() -> new NoSuchElementException("board not found"));
-        Columns existingColumn = columnsRepository.findByStatusTitleIgnoreCase(dto.getStatusTitle()).orElse(null);
+        Columns existingColumn = columnsRepository.findByStatusTitleIgnoreCase(dto.getStatusTitle(), board.getId()).orElse(null);
 
         if (existingColumn != null) {
             throw new ResourceConflictException("a column with this title already exists");
@@ -47,7 +47,7 @@ public class ColumnsService {
             throw new ResourceConflictException("a column with this title already exists");
         }
 
-        if (!dto.getStatusTitle().isEmpty() && dto.getStatusTitle() != null) {
+        if (!dto.getStatusTitle().isEmpty()) {
             col.setStatusTitle(dto.getStatusTitle());
         }
 

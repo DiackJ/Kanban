@@ -22,17 +22,20 @@ public class TasksDetailsDTO {
         this.statusColumn = status;
         this.columnId = columnId;
     }
-    public TasksDetailsDTO(long id, String taskTitle, String status, int complete, int incomplete, List<SubtasksDetailsDTO> subtasksList) {
+    public TasksDetailsDTO(long id, String taskTitle, String description, String status, int complete, int incomplete, List<SubtasksDetailsDTO> subtasksList, long columnId) {
         this.id = id;
         this.taskTitle = taskTitle;
+        this.description = description;
         this.statusColumn = status;
         this.numOfCompleteTasks = complete;
         this.numOfIncompleteTasks = incomplete;
         this.subtasksList = subtasksList;
+        this.columnId = columnId;
     }
-    public TasksDetailsDTO(long id, String taskTitle) {
+    public TasksDetailsDTO(long id, String taskTitle, String description) {
         this.id = id;
         this.taskTitle = taskTitle;
+        this.description = description;
     }
     public TasksDetailsDTO(long id, String taskTitle, int complete, int incomplete) {
         this.id = id;

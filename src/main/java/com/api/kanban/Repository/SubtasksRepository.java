@@ -8,6 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface SubtasksRepository extends JpaRepository<Subtasks, Long> {
-    @Query("SELECT s FROM Subtasks WHERE e.isComplete = :val")
-    List<Subtasks> findIsComplete(@Param("val") boolean val);
+    @Query("SELECT s FROM Subtasks s WHERE s.isComplete = :val AND s.task.id = :taskId")
+    List<Subtasks> findIsComplete(@Param("val") boolean val, @Param("taskId") long taskId);
 }

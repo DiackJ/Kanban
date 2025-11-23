@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class IsCompleteDTO {
-    private boolean isComplete;
+    private boolean complete;
 }

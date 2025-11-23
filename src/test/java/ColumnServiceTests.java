@@ -46,9 +46,10 @@ public class ColumnServiceTests {
     @Test
     void addNewDupeColumn_shouldThrowException() throws ResourceConflictException {
         Boards board = new Boards();
+        board.setId(1L);
         when(boardsRepository.findById(1L)).thenReturn(Optional.of(board));
         Columns col = new Columns();
-        when(columnsRepository.findByStatusTitleIgnoreCase("Done")).thenReturn(Optional.of(col));
+        when(columnsRepository.findByStatusTitleIgnoreCase("Done", board.getId())).thenReturn(Optional.of(col));
 
         ColumnsDTO dto = new ColumnsDTO();
         dto.setStatusTitle("Done");

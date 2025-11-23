@@ -7,6 +7,7 @@ import com.api.kanban.Entity.Subtasks;
 import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Repository.SubtasksRepository;
 import com.api.kanban.Repository.TasksRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,12 +51,16 @@ public class SubtasksService {
         );
     }
 
-    public void markAsComplete(IsCompleteDTO dto, long id) {
+    @Transactional
+    public void markAsComplete(IsCompleteDTO complete, long id) {
         Subtasks st = subtasksRepository.findById(id).orElseThrow(() -> new NoSuchElementException("subtask not found"));
 
-        if (dto.isComplete()) {
+        if (!complete.isComplete()) {
+            st.setComplete(false);
+        }else {
             st.setComplete(true);
         }
+
         subtasksRepository.save(st);
     }
 
