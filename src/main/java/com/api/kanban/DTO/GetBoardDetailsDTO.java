@@ -1,5 +1,6 @@
 package com.api.kanban.DTO;
 
+import com.api.kanban.Entity.Columns;
 import lombok.Data;
 
 import java.util.List;
@@ -21,15 +22,14 @@ public class GetBoardDetailsDTO {
         this.userId = userId;
         this.columnsList = colList;
     }
-    public GetBoardDetailsDTO(long id, String title, String desc, UUID userId) {
+    public GetBoardDetailsDTO(long id, String title) {
         this.id = id;
         this.boardTitle = title;
-        this.description = desc;
-        this.userId = userId;
     }
     public GetBoardDetailsDTO(long id, String title, String desc) {
         this.id = id;
         this.boardTitle = title;
         this.description = desc;
     }
+
 }

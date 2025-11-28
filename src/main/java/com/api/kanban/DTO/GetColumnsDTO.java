@@ -11,8 +11,8 @@ public class GetColumnsDTO {
     private String statusTitle;
     private List<GetTasksDTO> tasks;
 
-//    public GetColumnsDTO(long id, String status) {
-//        this.id = id;
-//        this.statusTitle = status;
-//    }
+    public GetColumnsDTO(long id, String status) {
+        this.id = id;
+        this.statusTitle = status;
+    }
 }

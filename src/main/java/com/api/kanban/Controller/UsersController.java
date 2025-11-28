@@ -8,7 +8,6 @@ import com.api.kanban.Util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -117,10 +116,10 @@ public class UsersController {
 
     // make a request to get list of boards for nav bar
     @GetMapping("/api/v1/nav")
-    public ResponseEntity<List<GetBoardDTO>> getNavigation(HttpServletRequest req) {
+    public ResponseEntity<List<GetBoardNavDTO>> getNavigation(HttpServletRequest req) {
         Users user = usersService.getUser(req);
 
-        List<GetBoardDTO> boards = usersService.getNavInfo(user);
+        List<GetBoardNavDTO> boards = usersService.getNavInfo(user);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

@@ -9,13 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class ColumnsController {
     @Autowired
     private ColumnsService columnsService;
 
     // request to add (create) a new column
-    // good
     @PostMapping("/api/v1/board/{boardId}/column")
     public ResponseEntity<ColumnsDetailsDTO> addNewColumn(@RequestBody ColumnsDTO dto, @PathVariable long boardId) {
         ColumnsDetailsDTO col = columnsService.addNewColumn(dto, boardId);
@@ -26,7 +27,6 @@ public class ColumnsController {
     }
 
     // request for editing a column
-    // good but maybe disable ignore case for edit?
     @PutMapping("/api/v1/column/{id}")
     public ResponseEntity<ColumnsDetailsDTO> editColumn(@RequestBody ColumnsDTO dto, @PathVariable long id) {
         ColumnsDetailsDTO col = columnsService.editColumnName(dto, id);
@@ -35,7 +35,16 @@ public class ColumnsController {
                 .status(HttpStatus.OK)
                 .body(col);
     }
-// good
+
+    @GetMapping("/api/v1/column")
+    public ResponseEntity<List<ColumnsDetailsDTO>> getColumnsList(@PathVariable long boardId) {
+        List<ColumnsDetailsDTO> list = columnsService.getColumnsList(boardId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(list);
+    }
+
     @DeleteMapping("/api/v1/column/{id}")
     public ResponseEntity<?> deleteColumn(@PathVariable long id) {
         columnsService.removeColumn(id);

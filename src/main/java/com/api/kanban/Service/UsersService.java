@@ -86,10 +86,10 @@ public class UsersService {
     }
 
     // return a list of board objs that contain the title and id for navigation
-    public List<GetBoardDTO> getNavInfo(Users user) {
+    public List<GetBoardNavDTO> getNavInfo(Users user) {
         List<Boards> boards = user.getBoardsList();
 
-        return boards.stream().map(b -> new GetBoardDTO(
+        return boards.stream().map(b -> new GetBoardNavDTO(
                 b.getBoardTitle(),
                 b.getId()
         )).toList();

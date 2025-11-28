@@ -46,9 +46,7 @@ public class TasksService {
         tasksRepository.save(task);
         return new TasksDetailsDTO(
                 task.getId(),
-                task.getTaskTitle(),
-                task.getStatusColumn(),
-                task.getColumn().getId()
+                task.getTaskTitle()
         );
     }
 

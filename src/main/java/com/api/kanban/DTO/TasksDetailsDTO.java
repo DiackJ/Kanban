@@ -43,4 +43,8 @@ public class TasksDetailsDTO {
         this.numOfCompleteTasks = complete;
         this.numOfIncompleteTasks = incomplete;
     }
+    public TasksDetailsDTO(long id, String taskTitle) {
+        this.id = id;
+        this.taskTitle = taskTitle;
+    }
 }

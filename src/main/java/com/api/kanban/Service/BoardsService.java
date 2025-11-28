@@ -47,10 +47,6 @@ public class BoardsService {
         board.setUpdatedAt(LocalDateTime.now());
         board.setUser(user);
 
-        // only set description if provided by user
-        if (dto.getDescription() != null) {
-            board.setDescription(dto.getDescription());
-        }
         boardsRepository.save(board);
 
         // create and set default columns
@@ -61,9 +57,7 @@ public class BoardsService {
 
         return new GetBoardDetailsDTO(
                 board.getId(),
-                board.getBoardTitle(),
-                board.getDescription(),
-                board.getUser().getId()
+                board.getBoardTitle()
         );
     }
 

@@ -10,6 +10,7 @@ import com.api.kanban.Repository.ColumnsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -56,6 +57,15 @@ public class ColumnsService {
                 col.getId(),
                 col.getStatusTitle()
         );
+    }
+
+    public List<ColumnsDetailsDTO> getColumnsList(long boardId) {
+        List<Columns> colList = columnsRepository.findAllColumnsByBoardId(boardId);
+
+        return colList.stream().map(col -> new ColumnsDetailsDTO(
+                col.getId(),
+                col.getStatusTitle()
+        )).toList();
     }
 
     public void removeColumn(long id) {
