@@ -1,8 +1,5 @@
 import com.api.kanban.CustomException.ResourceConflictException;
-import com.api.kanban.DTO.ColumnsDTO;
-import com.api.kanban.DTO.MoveTaskRequest;
-import com.api.kanban.DTO.TasksDTO;
-import com.api.kanban.DTO.TasksDetailsDTO;
+import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Entity.Columns;
@@ -76,7 +73,7 @@ public class TaskServiceTests {
         when(tasksRepository.findById(1L)).thenReturn(Optional.of(t));
         when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        TasksDTO dto = new TasksDTO();
+        EditTaskRequest dto = new EditTaskRequest();
         dto.setTaskTitle("update db schema");
 
         tasksService.editTask(dto, 1L);

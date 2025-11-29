@@ -39,10 +39,6 @@ public class TasksService {
         task.setColumn(col);
         task.setStatusColumn(col.getStatusTitle());
 
-        if(dto.getDescription() != null) {
-            task.setDescription(dto.getDescription());
-        }
-
         tasksRepository.save(task);
         return new TasksDetailsDTO(
                 task.getId(),
@@ -50,7 +46,7 @@ public class TasksService {
         );
     }
 
-    public TasksDetailsDTO editTask(TasksDTO dto, long taskId) {
+    public TasksDetailsDTO editTask(EditTaskRequest dto, long taskId) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
 
         if (dto.getTaskTitle() != null && !dto.getTaskTitle().equalsIgnoreCase(task.getTaskTitle())) {

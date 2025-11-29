@@ -137,7 +137,7 @@ public class UsersController {
     }
 
     @PostMapping("/auth/api/v1/reverify")
-    public ResponseEntity<String> resendVerification(@RequestBody ReverifyRequest dto) {
+    public ResponseEntity<String> resendVerification(@RequestBody VerifyRequest dto) {
         usersService.resendNewVerificationCode(dto);
 
         return ResponseEntity

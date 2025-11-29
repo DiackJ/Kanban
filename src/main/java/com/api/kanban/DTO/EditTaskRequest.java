@@ -3,6 +3,7 @@ package com.api.kanban.DTO;
 import lombok.Data;
 
 @Data
-public class TasksDTO {
+public class EditTaskRequest {
     private String taskTitle;
+    private String description;
 }

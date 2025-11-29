@@ -131,7 +131,7 @@ public class UsersService {
     }
 
     // regenerate and resend a new verification code
-    public void resendNewVerificationCode(ReverifyRequest dto) {
+    public void resendNewVerificationCode(VerifyRequest dto) {
         Users user = usersRepository.findByEmail(dto.getEmail()).orElseThrow(() -> new RuntimeException("an error occurred. please try again"));
 
         SecureRandom random = new SecureRandom();

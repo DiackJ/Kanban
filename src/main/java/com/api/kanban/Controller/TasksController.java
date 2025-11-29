@@ -1,5 +1,6 @@
 package com.api.kanban.Controller;
 
+import com.api.kanban.DTO.EditTaskRequest;
 import com.api.kanban.DTO.MoveTaskRequest;
 import com.api.kanban.DTO.TasksDTO;
 import com.api.kanban.DTO.TasksDetailsDTO;
@@ -29,7 +30,7 @@ public class TasksController {
 
     // request to edit a task
     @PutMapping("/api/v1/task/{id}")
-    public ResponseEntity<TasksDetailsDTO> editTask(@RequestBody TasksDTO dto, @PathVariable long id) {
+    public ResponseEntity<TasksDetailsDTO> editTask(@RequestBody EditTaskRequest dto, @PathVariable long id) {
         TasksDetailsDTO task = tasksService.editTask(dto, id);
 
         return ResponseEntity
