@@ -14,6 +14,7 @@ public class TasksDetailsDTO {
     private int numOfCompleteTasks;
     private int numOfIncompleteTasks;
     private List<SubtasksDetailsDTO> subtasksList;
+    private long order;
 
     public TasksDetailsDTO(){}
     public TasksDetailsDTO(long id, String taskTitle, String status, long columnId) {
@@ -43,8 +44,9 @@ public class TasksDetailsDTO {
         this.numOfCompleteTasks = complete;
         this.numOfIncompleteTasks = incomplete;
     }
-    public TasksDetailsDTO(long id, String taskTitle) {
+    public TasksDetailsDTO(long id, String taskTitle, long order) {
         this.id = id;
         this.taskTitle = taskTitle;
+        this.order = order;
     }
 }

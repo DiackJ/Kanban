@@ -16,6 +16,7 @@ public class Tasks {
     private LocalDateTime updatedAt;
     private String taskTitle;
     private String description;
+    private long order;
     @ManyToOne
     @JoinColumn(name = "column_id")
     private Columns column;

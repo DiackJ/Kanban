@@ -4,6 +4,7 @@ import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Entity.Columns;
+import com.api.kanban.Entity.Subtasks;
 import com.api.kanban.Repository.ColumnsRepository;
 import com.api.kanban.Repository.SubtasksRepository;
 import com.api.kanban.Repository.TasksRepository;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -39,10 +41,25 @@ public class TasksService {
         task.setColumn(col);
         task.setStatusColumn(col.getStatusTitle());
 
+        if (dto.getSubtasks() != null && !dto.getSubtasks().isEmpty()) {
+            List<Subtasks> list = dto.getSubtasks().stream()
+                    .map(st -> {
+                        st.setSubtaskTitle(st.getSubtaskTitle());
+                        st.setTask(task);
+                        return st;
+                    }).toList();
+            task.setSubtasksList(list);
+
+        }
+
+        long tOrder = Math.max(-1, col.getTasksList().size()) + 1;
+        task.setOrder(tOrder);
+
         tasksRepository.save(task);
         return new TasksDetailsDTO(
                 task.getId(),
-                task.getTaskTitle()
+                task.getTaskTitle(),
+                task.getOrder()
         );
     }
 
@@ -73,6 +90,9 @@ public class TasksService {
         task.setColumn(column);
         task.setUpdatedAt(LocalDateTime.now());
 
+        long tOrder = Math.max(-1, column.getTasksList().size()) + 1;
+        task.setOrder(tOrder);
+
         tasksRepository.save(task);
         return new TasksDetailsDTO(
                 task.getId(),
@@ -81,23 +101,6 @@ public class TasksService {
                 task.getColumn().getId()
         );
     }
-// move a task by updating status. user inputs status and if exists as col, update accordingly to move task into col
-//    public TasksDetailsDTO updateTaskStatus(ColumnsDTO status, long taskId) {
-//        Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
-//        Columns column = columnsRepository.findByStatusTitleIgnoreCase(status.getStatusTitle()).orElseThrow(() -> new NoSuchElementException("column not found"));
-//
-//        task.setUpdatedAt(LocalDateTime.now());
-//        task.setStatusColumn(column.getStatusTitle());
-//        task.setColumn(column);
-//
-//        tasksRepository.save(task);
-//        return new TasksDetailsDTO(
-//                task.getId(),
-//                task.getTaskTitle(),
-//                task.getStatusColumn(),
-//                task.getColumn().getId()
-//        );
-//    }
 
     public TasksDetailsDTO getTasks(long id) {
         Tasks task = tasksRepository.findById(id).orElseThrow(() -> new NoSuchElementException("task not found"));

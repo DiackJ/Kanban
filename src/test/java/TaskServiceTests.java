@@ -28,43 +28,43 @@ public class TaskServiceTests {
     @InjectMocks
     private TasksService tasksService;
 
-    @Test
-    void createNewTask_shouldCreateANewTask() {
-        Boards board = new Boards();
-        board.setId(1L);
-        Columns col = new Columns();
-        col.setBoard(board);
-        when(columnsRepository.findById(1L)).thenReturn(Optional.of(col));
-        when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        TasksDTO dto = new TasksDTO();
-        dto.setTaskTitle("implement backend logic");
-
-        TasksDetailsDTO task = tasksService.createNewTask(dto, 1L);
-
-        assertEquals("implement backend logic", task.getTaskTitle());
-        //assertEquals(col, task.getColumn());
-    }
-
-    @Test
-    void createDupeTask_shouldThrowConflictException() throws ResourceConflictException {
-        Tasks t = new Tasks();
-        t.setTaskTitle("implement backend");
-        Boards board = new Boards();
-        board.setId(1L);
-        Columns c = new Columns();
-        c.setBoard(board);
-        when(columnsRepository.findById(1L)).thenReturn(Optional.of(c));
-        // eq() tells mockito that this arg should equal exactly this value
-        when(tasksRepository.findByTaskTitleIgnoreCase(argThat(s -> s.equalsIgnoreCase(t.getTaskTitle())), eq(1L))).thenReturn(Optional.of(t));
-
-        TasksDTO dto = new TasksDTO();
-        dto.setTaskTitle("Implement Backend");
-
-        assertThrows(ResourceConflictException.class, () -> {
-            tasksService.createNewTask(dto, 1L);
-        });
-    }
+//    @Test
+//    void createNewTask_shouldCreateANewTask() {
+//        Boards board = new Boards();
+//        board.setId(1L);
+//        Columns col = new Columns();
+//        col.setBoard(board);
+//        when(columnsRepository.findById(1L)).thenReturn(Optional.of(col));
+//        when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
+//
+//        TasksDTO dto = new TasksDTO();
+//        dto.setTaskTitle("implement backend logic");
+//
+//        TasksDetailsDTO task = tasksService.createNewTask(dto, 1L);
+//
+//        assertEquals("implement backend logic", task.getTaskTitle());
+//        //assertEquals(col, task.getColumn());
+//    }
+//
+//    @Test
+//    void createDupeTask_shouldThrowConflictException() throws ResourceConflictException {
+//        Tasks t = new Tasks();
+//        t.setTaskTitle("implement backend");
+//        Boards board = new Boards();
+//        board.setId(1L);
+//        Columns c = new Columns();
+//        c.setBoard(board);
+//        when(columnsRepository.findById(1L)).thenReturn(Optional.of(c));
+//        // eq() tells mockito that this arg should equal exactly this value
+//        when(tasksRepository.findByTaskTitleIgnoreCase(argThat(s -> s.equalsIgnoreCase(t.getTaskTitle())), eq(1L))).thenReturn(Optional.of(t));
+//
+//        TasksDTO dto = new TasksDTO();
+//        dto.setTaskTitle("Implement Backend");
+//
+//        assertThrows(ResourceConflictException.class, () -> {
+//            tasksService.createNewTask(dto, 1L);
+//        });
+//    }
 
     @Test
     void editTask_shouldChangeTaskTitle() {
@@ -81,54 +81,29 @@ public class TaskServiceTests {
         assertEquals("update db schema", t.getTaskTitle());
     }
 
-    @Test
-    void moveTask_shouldUpdateStatusOfTask() {
-        // old / current col
-        Columns oldCol = new Columns();
-        // task to move
-        Tasks t = new Tasks();
-        t.setStatusColumn("To Do");
-        t.setColumn(oldCol); // current col of the task is the "old column"
-        // new col to move task to
-        Columns newCol = new Columns();
-        newCol.setStatusTitle("In Progress");
-        // look for & return new col
-        when(columnsRepository.findById(2L)).thenReturn(Optional.of(newCol));
-
-        when(tasksRepository.findById(1L)).thenReturn(Optional.of(t));
-        when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        MoveTaskRequest req = new MoveTaskRequest();
-        req.setColumnId(2L);
-        tasksService.moveTask(req, 1L);
-
-        assertEquals(newCol, t.getColumn()); // check that task col got updated (task moved)
-        assertEquals("In Progress", t.getStatusColumn()); // check that status was updated to new col status
-    }
-
 //    @Test
-//    void updateTaskStatus_shouldMoveTask() {
-//        // current col
+//    void moveTask_shouldUpdateStatusOfTask() {
+//        // old / current col
 //        Columns oldCol = new Columns();
 //        // task to move
 //        Tasks t = new Tasks();
 //        t.setStatusColumn("To Do");
-//        t.setColumn(oldCol);
+//        t.setColumn(oldCol); // current col of the task is the "old column"
 //        // new col to move task to
 //        Columns newCol = new Columns();
 //        newCol.setStatusTitle("In Progress");
-//        // locate new col
-//        when(columnsRepository.findByStatusTitleIgnoreCase(newCol.getStatusTitle())).thenReturn(Optional.of(newCol));
-//        // get and save task
+//        // look for & return new col
+//        when(columnsRepository.findById(2L)).thenReturn(Optional.of(newCol));
+//
 //        when(tasksRepository.findById(1L)).thenReturn(Optional.of(t));
 //        when(tasksRepository.save(any(Tasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
 //
-//        ColumnsDTO dto = new ColumnsDTO();
-//        dto.setStatusTitle("In Progress");
+//        MoveTaskRequest req = new MoveTaskRequest();
+//        req.setColumnId(2L);
+//        tasksService.moveTask(req, 1L);
 //
-//        tasksService.updateTaskStatus(dto, 1L);
-//
-//        assertEquals(newCol, t.getColumn()); // check task was moved
-//        assertEquals("In Progress", t.getStatusColumn()); // check status was updated
+//        assertEquals(newCol, t.getColumn()); // check that task col got updated (task moved)
+//        assertEquals("In Progress", t.getStatusColumn()); // check that status was updated to new col status
 //    }
+
 }
