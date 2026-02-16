@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,11 +17,11 @@ public class Tasks {
     private LocalDateTime updatedAt;
     private String taskTitle;
     private String description;
-    private long order;
+    private long orderNum;
     @ManyToOne
     @JoinColumn(name = "column_id")
     private Columns column;
     private String statusColumn; // = column.getStatusColumn
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Subtasks> subtasksList;
+    private List<Subtasks> subtasksList = new ArrayList<>();
 }

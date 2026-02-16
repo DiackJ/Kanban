@@ -1,6 +1,5 @@
 package com.api.kanban.DTO;
 
-import com.api.kanban.Entity.Subtasks;
 import lombok.Data;
 
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.List;
 @Data
 public class TasksDTO {
     private String taskTitle;
-    private List<Subtasks> subtasks;
-    private long order;
+    private String description;
+    private List<String> subtasks;
+    private long orderNum;
 }

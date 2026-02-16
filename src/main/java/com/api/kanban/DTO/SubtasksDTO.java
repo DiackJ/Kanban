@@ -7,5 +7,4 @@ import lombok.Data;
 @Data
 public class SubtasksDTO {
     private String subtaskTitle;
-    private Tasks task;
 }

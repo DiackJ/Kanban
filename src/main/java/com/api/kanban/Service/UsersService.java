@@ -10,6 +10,7 @@ import com.api.kanban.Repository.UsersRepository;
 import com.api.kanban.Util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,9 +36,11 @@ public class UsersService {
     private BoardsRepository boardsRepository;
     @Autowired
     private SubtasksRepository subtasksRepository;
+    @Value("${APP_EMAIL}")
+    private String emailSender;
 
     // add a new user
-    public Users addNewUser(SignupRequest dto) {
+    public UserDetailsDTO addNewUser(SignupRequest dto) {
         Users existingUser = usersRepository.findByEmail(dto.getEmail()).orElse(null);
 
         if (existingUser != null) {
@@ -57,12 +60,16 @@ public class UsersService {
         usersRepository.save(user);
 
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("lisa74@ethereal.email");
         message.setTo(dto.getEmail());
         message.setSubject("kanban verification code");
         message.setText("Your kanban verification code is: " + verificationCode);
         mailSender.send(message);
 
-        return user;
+        return new UserDetailsDTO(
+                user.getEmail(),
+                user.isEnabled()
+        );
     }
 
     public Users verifyAccount(VerifyRequest req, String email) {
@@ -98,28 +105,29 @@ public class UsersService {
     // return the details for the currently selected board
     public GetBoardDetailsDTO getCurrentBoard(long id) {
         Boards b = boardsRepository.findById(id).orElseThrow(() -> new NoSuchElementException("This board could not be found."));
-        //GetBoardDetailsDTO board = new GetBoardDetailsDTO();
 
         // get each column of the board
-        List<ColumnsDetailsDTO> colList = b.getColumnsList().stream().map(col -> {
-            ColumnsDetailsDTO dto = new ColumnsDetailsDTO();
-            dto.setId(col.getId());
-            dto.setStatusTitle(col.getStatusTitle());
+        // ok this nested stream stuff really needs to get cleaned up for real..so inefficient bro its like O(n^3)
+        List<ColumnsDetailsDTO> colList = b.getColumnsList().stream().map(col -> new ColumnsDetailsDTO(
+                col.getId(),
+                col.getStatusTitle(),
+                col.getTasksList().stream().map(t -> new TasksDetailsDTO(
+                        t.getId(),
+                        t.getTaskTitle(),
+                        t.getColumn().getId(),
+                        t.getStatusColumn(),
+                        subtasksRepository.findIsComplete(true, t.getId()).size(),
+                        subtasksRepository.findIsComplete(false, t.getId()).size(),
+                        t.getSubtasksList().stream().map(st -> new SubtasksDetailsDTO(
+                                st.getId(),
+                                st.getSubtaskTitle(),
+                                st.isComplete(),
+                                st.getTask().getId()
+                        )).toList(),
+                        t.getOrderNum()
+                )).toList()
+        )).toList();
 
-            // for each column get each task list
-            List<TasksDetailsDTO> tasks = col.getTasksList().stream().map(t -> new TasksDetailsDTO(
-                    t.getId(),
-                    t.getTaskTitle(),
-                    subtasksRepository.findIsComplete(true, t.getId()).size(),
-                    subtasksRepository.findIsComplete(false, t.getId()).size()
-            )).toList();
-
-            dto.setTasksList(tasks);
-            return dto;
-        }).toList();
-
-       // board.setBoardTitle(b.getBoardTitle());
-        //board.setColumnsList(c);
 
         return new GetBoardDetailsDTO(
                 b.getId(),

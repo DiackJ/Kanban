@@ -5,4 +5,6 @@ import lombok.Data;
 @Data
 public class ColumnsDTO {
     private String statusTitle;
+    
+    public ColumnsDTO(){}
 }

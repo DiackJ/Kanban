@@ -1,5 +1,6 @@
 package com.api.kanban.DTO;
 
+import com.api.kanban.Entity.Tasks;
 import lombok.Data;
 
 @Data
@@ -16,4 +17,5 @@ public class SubtasksDetailsDTO {
         this.isComplete = isComplete;
         this.taskId = taskId;
     }
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,5 +21,6 @@ public class Users {
     private Integer verificationCode;
     private boolean enabled;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Boards> boardsList;
+    private List<Boards> boardsList = new ArrayList<>();
+
 }

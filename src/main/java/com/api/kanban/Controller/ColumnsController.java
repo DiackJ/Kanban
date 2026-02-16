@@ -36,7 +36,7 @@ public class ColumnsController {
                 .body(col);
     }
 
-    @GetMapping("/api/v1/column")
+    @GetMapping("/api/v1/board/{boardId}/column")
     public ResponseEntity<List<ColumnsDetailsDTO>> getColumnsList(@PathVariable long boardId) {
         List<ColumnsDetailsDTO> list = columnsService.getColumnsList(boardId);
 

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -26,8 +25,8 @@ public class TasksService {
     private SubtasksRepository subtasksRepository;
 
     // fix ignore case logic
-    public TasksDetailsDTO createNewTask(TasksDTO dto, long columnId) {
-        Columns col = columnsRepository.findById(columnId).orElseThrow(() -> new NoSuchElementException("column not found"));
+    public TasksDetailsDTO createNewTask(TasksDTO dto, long colId) {
+        Columns col = columnsRepository.findById(colId).orElseThrow(() -> new NoSuchElementException("column not found"));
         Tasks existingTask = tasksRepository.findByTaskTitleIgnoreCase(dto.getTaskTitle(), col.getBoard().getId()).orElse(null);
 
         if (existingTask != null) {
@@ -41,25 +40,29 @@ public class TasksService {
         task.setColumn(col);
         task.setStatusColumn(col.getStatusTitle());
 
-        if (dto.getSubtasks() != null && !dto.getSubtasks().isEmpty()) {
+        if (dto.getDescription() != null) {
+            task.setDescription(dto.getDescription());
+        }
+
+        if (dto.getSubtasks() != null) {
             List<Subtasks> list = dto.getSubtasks().stream()
-                    .map(st -> {
-                        st.setSubtaskTitle(st.getSubtaskTitle());
-                        st.setTask(task);
-                        return st;
-                    }).toList();
+                    .map(st -> new Subtasks(
+                            st,
+                            false,
+                            task
+                    )).toList();
             task.setSubtasksList(list);
 
         }
 
         long tOrder = Math.max(-1, col.getTasksList().size()) + 1;
-        task.setOrder(tOrder);
+        task.setOrderNum(tOrder);
 
         tasksRepository.save(task);
         return new TasksDetailsDTO(
                 task.getId(),
                 task.getTaskTitle(),
-                task.getOrder()
+                task.getOrderNum()
         );
     }
 
@@ -91,7 +94,7 @@ public class TasksService {
         task.setUpdatedAt(LocalDateTime.now());
 
         long tOrder = Math.max(-1, column.getTasksList().size()) + 1;
-        task.setOrder(tOrder);
+        task.setOrderNum(tOrder);
 
         tasksRepository.save(task);
         return new TasksDetailsDTO(
@@ -123,7 +126,8 @@ public class TasksService {
                 completedTasks,
                 incompleteTasks,
                 subtasks,
-                task.getColumn().getId()
+                task.getColumn().getId(),
+                task.getOrderNum()
         );
     }
 

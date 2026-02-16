@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -52,17 +53,24 @@ public class SubtasksService {
     }
 
     @Transactional
-    public void markAsComplete(IsCompleteDTO complete, long id) {
+    public void markAsComplete(long id) {
         Subtasks st = subtasksRepository.findById(id).orElseThrow(() -> new NoSuchElementException("subtask not found"));
 
-        if (!complete.isComplete()) {
-            st.setComplete(false);
-        }else {
-            st.setComplete(true);
-        }
+        st.setComplete(!st.isComplete());
 
         subtasksRepository.save(st);
     }
+
+//    public List<SubtasksDetailsDTO> getSubtasks(long taskId) {
+//        Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
+//
+//        return task.getSubtasksList().stream().map(st -> new SubtasksDetailsDTO(
+//                st.getId(),
+//                st.getSubtaskTitle(),
+//                st.isComplete(),
+//                st.getTask().getId()
+//        )).toList();
+//    }
 
     public void removeSubtask(long id) {
         subtasksRepository.deleteById(id);

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,5 +22,10 @@ public class Boards {
     @JoinColumn(name = "user_id")
     private Users user;
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Columns> columnsList;
+    private List<Columns> columnsList = new ArrayList<>();
+
+    public void addColumn(Columns col) {
+        columnsList.add(col);
+        col.setBoard(this);
+    }
 }

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class SubtasksController {
     @Autowired
@@ -17,7 +19,7 @@ public class SubtasksController {
     @PostMapping("/api/v1/task/{taskId}/subtask")
     public ResponseEntity<SubtasksDetailsDTO> addNewSubtask(@RequestBody SubtasksDTO dto, @PathVariable long taskId) {
         if(dto.getSubtaskTitle().isEmpty()) {
-            throw new IllegalArgumentException("field cannot be blank");
+            throw new IllegalArgumentException("subtask title is required in order to add a new subtask.");
         }
         SubtasksDetailsDTO subtask = subtasksService.addNewSubtask(dto, taskId);
 
@@ -36,13 +38,22 @@ public class SubtasksController {
     }
 
     @PutMapping("/api/v1/subtask/{id}/complete")
-    public ResponseEntity<?> markAsComplete(@RequestBody IsCompleteDTO complete, @PathVariable long id) {
-        subtasksService.markAsComplete(complete, id);
+    public ResponseEntity<?> markAsComplete(@PathVariable long id) {
+        subtasksService.markAsComplete(id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(null);
     }
+
+//    @GetMapping("/api/v1/task/{id}/subtasks")
+//    public ResponseEntity<List<SubtasksDetailsDTO>> getSubtasks (@PathVariable long taskId) {
+//        List<SubtasksDetailsDTO> dto = subtasksService.getSubtasks(taskId);
+//
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(dto);
+//    }
 
     @DeleteMapping("/api/v1/subtask/{id}")
     public ResponseEntity<?> deleteSubtask(@PathVariable long id) {
