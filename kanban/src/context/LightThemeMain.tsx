@@ -1,0 +1,15 @@
+export const lightScheme ={
+        backgroundColor: "bg-indigo-50",
+        cardBgColor: "bg-white",
+        headerBgColor: "bg-white",
+        mainTextColor: "text-indigo-950",
+        secondaryTextColor: "text-gray-400",
+        borderColor: "border-gray-200",
+        buttonBgColor: "bg-indigo-500",
+        buttonHoverColor: "hover:bg-indigo-300",
+        navTriggerBg: "bg-violet-800",
+        navTriggerBorder: "border-indigo-50",
+        buttonTextColor: "text-white",
+        buttonBorderColor: "border-white",
+        svgFill: "fill-white",
+}

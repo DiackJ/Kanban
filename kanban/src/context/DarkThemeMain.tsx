@@ -1,0 +1,16 @@
+export const darkScheme ={
+        backgroundColor: "bg-[#20212c]",
+        cardBgColor: "bg-[#2b2c37]",
+        headerBgColor: "bg-[#2b2c37]",
+        mainTextColor: "text-[#9796b2]",
+        secondaryTextColor: "text-gray-400",
+        cardSecondaryTextColor: "text-gray-500",
+        borderColor: "border-zinc-700",
+        buttonBgColor: "bg-[#685fc7]",
+        buttonHoverColor: "hover:bg-[#a8a4ff] hover:opacity-80",
+        navTriggerBg: "bg-[#685fc7]",
+        navTriggerBorder: "border-zinc-800",
+        buttonTextColor: "text-gray-300",
+        buttonBorderColor: "border-zinc-700",
+        svgFill: "fill-gray-300",
+}
