@@ -67,10 +67,7 @@ public class SubtasksServiceTests {
         when(subtasksRepository.findById(1L)).thenReturn(Optional.of(st));
         when(subtasksRepository.save(any(Subtasks.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        IsCompleteDTO dto = new IsCompleteDTO();
-        dto.setComplete(true);
-
-        subtasksService.markAsComplete(dto, 1L);
+        subtasksService.markAsComplete(1L);
 
         assertTrue(st.isComplete());
     }

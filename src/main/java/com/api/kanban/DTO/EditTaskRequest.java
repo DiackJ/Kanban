@@ -2,12 +2,8 @@ package com.api.kanban.DTO;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class TasksDTO {
+public class EditTaskRequest {
     private String taskTitle;
     private String description;
-    private List<String> subtasks;
-    private long orderNum;
 }

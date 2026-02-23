@@ -1,5 +1,6 @@
 package com.api.kanban.DTO;
 
+import com.api.kanban.Entity.Subtasks;
 import lombok.Data;
 
 import java.util.List;
@@ -13,7 +14,8 @@ public class TasksDetailsDTO {
     private long columnId;
     private int numOfCompleteTasks;
     private int numOfIncompleteTasks;
-    private List<SubtasksDetailsDTO> subtasksList;
+    private List<SubtasksDetailsDTO> subtasks;
+    private long order;
 
     public TasksDetailsDTO(){}
     public TasksDetailsDTO(long id, String taskTitle, String status, long columnId) {
@@ -22,15 +24,16 @@ public class TasksDetailsDTO {
         this.statusColumn = status;
         this.columnId = columnId;
     }
-    public TasksDetailsDTO(long id, String taskTitle, String description, String status, int complete, int incomplete, List<SubtasksDetailsDTO> subtasksList, long columnId) {
+    public TasksDetailsDTO(long id, String taskTitle, String description, String status, int complete, int incomplete, List<SubtasksDetailsDTO> subtasks, long columnId, long order) {
         this.id = id;
         this.taskTitle = taskTitle;
         this.description = description;
         this.statusColumn = status;
         this.numOfCompleteTasks = complete;
         this.numOfIncompleteTasks = incomplete;
-        this.subtasksList = subtasksList;
+        this.subtasks = subtasks;
         this.columnId = columnId;
+        this.order = order;
     }
     public TasksDetailsDTO(long id, String taskTitle, String description) {
         this.id = id;
@@ -43,4 +46,22 @@ public class TasksDetailsDTO {
         this.numOfCompleteTasks = complete;
         this.numOfIncompleteTasks = incomplete;
     }
+    public TasksDetailsDTO(long id, String taskTitle, long order) {
+        this.id = id;
+        this.taskTitle = taskTitle;
+        this.order = order;
+    }
+
+
+    public TasksDetailsDTO(long id, String taskTitle, long colId, String statusColumn, int complete, int incomplete, List<SubtasksDetailsDTO> subtasks, long order) {
+        this.id = id;
+        this.taskTitle = taskTitle;
+        this.columnId = colId;
+        this.statusColumn = statusColumn;
+        this.numOfCompleteTasks = complete;
+        this.numOfIncompleteTasks = incomplete;
+        this.subtasks = subtasks;
+        this.order = order;
+    }
+
 }

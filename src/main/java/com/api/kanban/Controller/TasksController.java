@@ -1,5 +1,6 @@
 package com.api.kanban.Controller;
 
+import com.api.kanban.DTO.EditTaskRequest;
 import com.api.kanban.DTO.MoveTaskRequest;
 import com.api.kanban.DTO.TasksDTO;
 import com.api.kanban.DTO.TasksDetailsDTO;
@@ -15,12 +16,15 @@ public class TasksController {
     private TasksService tasksService;
 
     // request to create a new task
-    @PostMapping("/api/v1/column/{columnId}/task")
-    public ResponseEntity<TasksDetailsDTO> createNewTask(@RequestBody TasksDTO dto, @PathVariable long columnId) {
-        if (dto.getTaskTitle().isEmpty()) {
-            throw new IllegalArgumentException("field cannot be blank");
+    @PostMapping("/api/v1/column/{colId}/task")
+    public ResponseEntity<TasksDetailsDTO> createNewTask(@RequestBody TasksDTO dto, @PathVariable Long colId) {
+        if (dto.getTaskTitle().isEmpty() || dto.getTaskTitle().equalsIgnoreCase("New Task")) {
+            throw new IllegalArgumentException("task title is required.");
         }
-        TasksDetailsDTO task = tasksService.createNewTask(dto, columnId);
+        if (colId == null) {
+            throw new IllegalArgumentException("status column is required.");
+        }
+        TasksDetailsDTO task = tasksService.createNewTask(dto, colId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -29,7 +33,11 @@ public class TasksController {
 
     // request to edit a task
     @PutMapping("/api/v1/task/{id}")
-    public ResponseEntity<TasksDetailsDTO> editTask(@RequestBody TasksDTO dto, @PathVariable long id) {
+    public ResponseEntity<TasksDetailsDTO> editTask(@RequestBody EditTaskRequest dto, @PathVariable long id) {
+        if (dto.getTaskTitle().isEmpty()) {
+            throw new IllegalArgumentException("task title is required.");
+        }
+
         TasksDetailsDTO task = tasksService.editTask(dto, id);
 
         return ResponseEntity

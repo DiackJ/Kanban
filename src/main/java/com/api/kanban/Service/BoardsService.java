@@ -1,9 +1,7 @@
 package com.api.kanban.Service;
 
 import com.api.kanban.CustomException.ResourceConflictException;
-import com.api.kanban.DTO.BoardsDTO;
-import com.api.kanban.DTO.EditBoardRequest;
-import com.api.kanban.DTO.GetBoardDetailsDTO;
+import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Boards;
 import com.api.kanban.Entity.Columns;
 import com.api.kanban.Entity.Users;
@@ -13,8 +11,12 @@ import com.api.kanban.Repository.UsersRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class BoardsService {
@@ -29,7 +31,7 @@ public class BoardsService {
         this.usersRepository = usersRepository;
     }
 
-    // create a new kanban board
+    // create a new kanban board with title only
     public GetBoardDetailsDTO createNewBoard(BoardsDTO dto, UUID userId) {
         Users user = usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("an error occurred. please try again"));
         // check if a board with input title already exists
@@ -43,14 +45,13 @@ public class BoardsService {
 
         // set board details
         board.setBoardTitle(dto.getBoardTitle());
+        if (dto.getDescription() != null) {
+            board.setDescription(dto.getDescription());
+        }
         board.setCreatedAt(LocalDateTime.now());
         board.setUpdatedAt(LocalDateTime.now());
         board.setUser(user);
 
-        // only set description if provided by user
-        if (dto.getDescription() != null) {
-            board.setDescription(dto.getDescription());
-        }
         boardsRepository.save(board);
 
         // create and set default columns
@@ -59,11 +60,29 @@ public class BoardsService {
         columnsRepository.save(c1);
         columnsRepository.save(c2);
 
+        System.out.println(board.getColumnsList());
+        List<ColumnsDTO> colList;
+        if (dto.getColumns() != null) {
+            colList = dto.getColumns().stream()
+                    .map(ColumnsDTO::new).toList();
+
+            for (ColumnsDTO col : colList) {
+                Columns c = new Columns(col.getStatusTitle(), board);
+                columnsRepository.save(c);
+            }
+        }
+
+        List<ColumnsDetailsDTO> cols = board.getColumnsList().stream().map(col -> new ColumnsDetailsDTO(
+                col.getId(),
+                col.getStatusTitle()
+        )).toList();
+
         return new GetBoardDetailsDTO(
                 board.getId(),
                 board.getBoardTitle(),
                 board.getDescription(),
-                board.getUser().getId()
+                board.getUser().getId(),
+                cols
         );
     }
 
@@ -96,5 +115,13 @@ public class BoardsService {
     // delete existing board
     public void deleteBoard(long id) {
         boardsRepository.deleteById(id);
+    }
+
+    // reset board (delete all columns and tasks)
+    public void resetBoard(long id) {
+        List<Columns> cols = columnsRepository.findAllColumnsByBoardId(id);
+        for (Columns c : cols) {
+            columnsRepository.delete(c);
+        }
     }
 }

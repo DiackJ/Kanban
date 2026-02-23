@@ -4,6 +4,7 @@ import com.api.kanban.CustomException.ResourceConflictException;
 import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Tasks;
 import com.api.kanban.Entity.Columns;
+import com.api.kanban.Entity.Subtasks;
 import com.api.kanban.Repository.ColumnsRepository;
 import com.api.kanban.Repository.SubtasksRepository;
 import com.api.kanban.Repository.TasksRepository;
@@ -24,8 +25,8 @@ public class TasksService {
     private SubtasksRepository subtasksRepository;
 
     // fix ignore case logic
-    public TasksDetailsDTO createNewTask(TasksDTO dto, long columnId) {
-        Columns col = columnsRepository.findById(columnId).orElseThrow(() -> new NoSuchElementException("column not found"));
+    public TasksDetailsDTO createNewTask(TasksDTO dto, long colId) {
+        Columns col = columnsRepository.findById(colId).orElseThrow(() -> new NoSuchElementException("column not found"));
         Tasks existingTask = tasksRepository.findByTaskTitleIgnoreCase(dto.getTaskTitle(), col.getBoard().getId()).orElse(null);
 
         if (existingTask != null) {
@@ -39,20 +40,33 @@ public class TasksService {
         task.setColumn(col);
         task.setStatusColumn(col.getStatusTitle());
 
-        if(dto.getDescription() != null) {
+        if (dto.getDescription() != null) {
             task.setDescription(dto.getDescription());
         }
+
+        if (dto.getSubtasks() != null) {
+            List<Subtasks> list = dto.getSubtasks().stream()
+                    .map(st -> new Subtasks(
+                            st,
+                            false,
+                            task
+                    )).toList();
+            task.setSubtasksList(list);
+
+        }
+
+        long tOrder = Math.max(-1, col.getTasksList().size()) + 1;
+        task.setOrderNum(tOrder);
 
         tasksRepository.save(task);
         return new TasksDetailsDTO(
                 task.getId(),
                 task.getTaskTitle(),
-                task.getStatusColumn(),
-                task.getColumn().getId()
+                task.getOrderNum()
         );
     }
 
-    public TasksDetailsDTO editTask(TasksDTO dto, long taskId) {
+    public TasksDetailsDTO editTask(EditTaskRequest dto, long taskId) {
         Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
 
         if (dto.getTaskTitle() != null && !dto.getTaskTitle().equalsIgnoreCase(task.getTaskTitle())) {
@@ -79,6 +93,9 @@ public class TasksService {
         task.setColumn(column);
         task.setUpdatedAt(LocalDateTime.now());
 
+        long tOrder = Math.max(-1, column.getTasksList().size()) + 1;
+        task.setOrderNum(tOrder);
+
         tasksRepository.save(task);
         return new TasksDetailsDTO(
                 task.getId(),
@@ -87,23 +104,6 @@ public class TasksService {
                 task.getColumn().getId()
         );
     }
-// move a task by updating status. user inputs status and if exists as col, update accordingly to move task into col
-//    public TasksDetailsDTO updateTaskStatus(ColumnsDTO status, long taskId) {
-//        Tasks task = tasksRepository.findById(taskId).orElseThrow(() -> new NoSuchElementException("task not found"));
-//        Columns column = columnsRepository.findByStatusTitleIgnoreCase(status.getStatusTitle()).orElseThrow(() -> new NoSuchElementException("column not found"));
-//
-//        task.setUpdatedAt(LocalDateTime.now());
-//        task.setStatusColumn(column.getStatusTitle());
-//        task.setColumn(column);
-//
-//        tasksRepository.save(task);
-//        return new TasksDetailsDTO(
-//                task.getId(),
-//                task.getTaskTitle(),
-//                task.getStatusColumn(),
-//                task.getColumn().getId()
-//        );
-//    }
 
     public TasksDetailsDTO getTasks(long id) {
         Tasks task = tasksRepository.findById(id).orElseThrow(() -> new NoSuchElementException("task not found"));
@@ -126,7 +126,8 @@ public class TasksService {
                 completedTasks,
                 incompleteTasks,
                 subtasks,
-                task.getColumn().getId()
+                task.getColumn().getId(),
+                task.getOrderNum()
         );
     }
 

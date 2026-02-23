@@ -10,4 +10,5 @@ import java.util.List;
 public interface SubtasksRepository extends JpaRepository<Subtasks, Long> {
     @Query("SELECT s FROM Subtasks s WHERE s.isComplete = :val AND s.task.id = :taskId")
     List<Subtasks> findIsComplete(@Param("val") boolean val, @Param("taskId") long taskId);
+    List<Subtasks> findSubtasksByTaskId(long taskId);
 }

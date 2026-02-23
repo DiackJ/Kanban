@@ -5,4 +5,6 @@ import lombok.Data;
 @Data
 public class MoveTaskRequest {
     private long columnId;
+
+    public MoveTaskRequest(){}
 }

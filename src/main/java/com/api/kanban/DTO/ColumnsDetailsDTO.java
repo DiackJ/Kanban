@@ -3,13 +3,14 @@ package com.api.kanban.DTO;
 import lombok.Data;
 
 import java.util.List;
+
 // for when columns are shown
 @Data
 public class ColumnsDetailsDTO {
     private long id;
     private String statusTitle;
     private long boardId;
-    private List<TasksDetailsDTO> tasksList;
+    private List<TasksDetailsDTO> tasks;
 
     public ColumnsDetailsDTO() {}
     public ColumnsDetailsDTO(long id, String statusTitle, long boardId) {
@@ -21,4 +22,12 @@ public class ColumnsDetailsDTO {
         this.id = id;
         this.statusTitle = statusTitle;
     }
+
+   public ColumnsDetailsDTO(long id, String statusTitle, List<TasksDetailsDTO> tasks) {
+        this.id = id;
+        this.statusTitle = statusTitle;
+        this.tasks = tasks;
+   }
+
+
 }

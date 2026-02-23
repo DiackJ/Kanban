@@ -14,4 +14,12 @@ public class Subtasks {
     @ManyToOne
     @JoinColumn(name ="task_id")
     private Tasks task;
+
+    public Subtasks(){}
+
+    public Subtasks(String title, boolean complete, Tasks task) {
+        this.subtaskTitle = title;
+        this.isComplete = complete;
+        this.task = task;
+    }
 }

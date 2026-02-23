@@ -45,12 +45,12 @@ public class BoardServiceTests {
 
         BoardsDTO dto = new BoardsDTO();
         dto.setBoardTitle("Coding Project");
-        dto.setDescription("this board is for my new project");
+       // dto.setDescription("this board is for my new project");
 
         GetBoardDetailsDTO board = boardsService.createNewBoard(dto, user.getId());
 
         assertEquals("Coding Project", board.getBoardTitle());
-        assertEquals("this board is for my new project", board.getDescription());
+        //assertEquals("this board is for my new project", board.getDescription());
     }
 
     @Test

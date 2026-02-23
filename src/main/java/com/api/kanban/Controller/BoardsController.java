@@ -24,6 +24,10 @@ public class BoardsController {
 
     @PostMapping("/api/v1/board")
     public ResponseEntity<GetBoardDetailsDTO> createNewBoard(@RequestBody BoardsDTO dto, HttpServletRequest req) {
+        if(dto.getBoardTitle() == null || dto.getBoardTitle().isEmpty() || dto.getBoardTitle().equalsIgnoreCase("New Board")) {
+            throw new IllegalArgumentException("board title is required.");
+        }
+
         Users user = usersService.getUser(req);
 
         GetBoardDetailsDTO res = boardsService.createNewBoard(dto, user.getId());
@@ -35,6 +39,10 @@ public class BoardsController {
 
     @PutMapping("/api/v1/board/{id}")
     public ResponseEntity<GetBoardDetailsDTO> editBoard(@RequestBody EditBoardRequest dto, @PathVariable long id) {
+        if (dto.getBoardTitle() == null || dto.getBoardTitle().isEmpty()) {
+            throw new IllegalArgumentException("board title is required.");
+        }
+
         GetBoardDetailsDTO res = boardsService.editBoard(dto, id);
 
         return ResponseEntity
@@ -42,9 +50,18 @@ public class BoardsController {
                 .body(res);
     }
 
-    @DeleteMapping("/api/v1/board/{id}")
+    @PutMapping("/api/v1/board/{id}/delete")
     public ResponseEntity<?> deleteBoard(@PathVariable long id) {
         boardsService.deleteBoard(id);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(null);
+    }
+
+    @PutMapping("/api/v1/board/{id}/reset")
+    public ResponseEntity<?> resetBoard(@PathVariable long id) {
+        boardsService.resetBoard(id);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

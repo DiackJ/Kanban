@@ -1,5 +1,6 @@
 package com.api.kanban.Controller;
 
+import com.api.kanban.CustomException.UserNotVerifiedException;
 import com.api.kanban.DTO.*;
 import com.api.kanban.Entity.Users;
 import com.api.kanban.Repository.UsersRepository;
@@ -8,7 +9,6 @@ import com.api.kanban.Util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -35,7 +35,7 @@ public class UsersController {
 
     // make a request to sign up
     @PostMapping("/auth/api/v1/signup")
-    public ResponseEntity<String> addNewUser(@RequestBody SignupRequest dto) {
+    public ResponseEntity<UserDetailsDTO> addNewUser(@RequestBody SignupRequest dto) {
         if (dto.getEmail() == null) {
             throw new IllegalArgumentException("Email field cannot be blank");
         }
@@ -43,16 +43,16 @@ public class UsersController {
             throw new IllegalArgumentException("Password field cannot be blank");
         }
 
-        usersService.addNewUser(dto);
+        UserDetailsDTO userDTO = usersService.addNewUser(dto);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("verification code sent to " + dto.getEmail());
+                .body(userDTO);
     }
 
     // make a request to verify new account
     @PostMapping("/auth/api/v1/verification")
-    public ResponseEntity<String> verifyUser(@RequestBody VerifyRequest req, HttpServletResponse res) {
+    public ResponseEntity<UserDetailsDTO> verifyUser(@RequestBody VerifyRequest req, HttpServletResponse res) {
         if (req.getCode() == null) {
             throw new IllegalArgumentException("Verification code cannot be blank");
         }
@@ -70,19 +70,24 @@ public class UsersController {
                 .build();
         res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
+        UserDetailsDTO userdto = new UserDetailsDTO(user.getEmail(), user.isEnabled());
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("account verified");
+                .body(userdto);
     }
 
     // make request to log in
     @PostMapping("/auth/api/v1/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest dto, HttpServletRequest req, HttpServletResponse res) {
+    public ResponseEntity<UserDetailsDTO> loginUser(@RequestBody LoginRequest dto, HttpServletRequest req, HttpServletResponse res) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPasswordHash())
         );
         if (auth.isAuthenticated()) {
             Users user = usersRepository.findByEmail(dto.getEmail()).orElseThrow();
+            if (!user.isEnabled()) {
+                throw new UserNotVerifiedException("Please check your email for a verification code to log in.");
+            }
             String token = jwtUtil.createToken(user.getId(), dto.getEmail());
             ResponseCookie cookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)
@@ -92,9 +97,10 @@ public class UsersController {
                     .path("/")
                     .build();
             res.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            UserDetailsDTO userdto = new UserDetailsDTO(user.getEmail(), user.isEnabled());
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body("login successful");
+                    .body(userdto);
         } else {
             throw new BadCredentialsException("Username or password is incorrect.");
         }
@@ -117,10 +123,10 @@ public class UsersController {
 
     // make a request to get list of boards for nav bar
     @GetMapping("/api/v1/nav")
-    public ResponseEntity<List<GetBoardDTO>> getNavigation(HttpServletRequest req) {
+    public ResponseEntity<List<GetBoardNavDTO>> getNavigation(HttpServletRequest req) {
         Users user = usersService.getUser(req);
 
-        List<GetBoardDTO> boards = usersService.getNavInfo(user);
+        List<GetBoardNavDTO> boards = usersService.getNavInfo(user);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -138,7 +144,7 @@ public class UsersController {
     }
 
     @PostMapping("/auth/api/v1/reverify")
-    public ResponseEntity<String> resendVerification(@RequestBody ReverifyRequest dto) {
+    public ResponseEntity<String> resendVerification(@RequestBody VerifyRequest dto) {
         usersService.resendNewVerificationCode(dto);
 
         return ResponseEntity

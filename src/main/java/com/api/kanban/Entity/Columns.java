@@ -3,6 +3,7 @@ package com.api.kanban.Entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,7 +17,7 @@ public class Columns {
     @JoinColumn(name ="board_id")
     private Boards board;
     @OneToMany(mappedBy = "column", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Tasks> tasksList;
+    private List<Tasks> tasksList = new ArrayList<>();
 
     public Columns(){}
 
