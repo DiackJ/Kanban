@@ -1,0 +1,60 @@
+[
+    {
+        "id": 1,
+        "boardTitle": "Project One",
+        "userId": "fdklsf34j32-59ulrjfldkfjw3r-3r",
+        "columnsList": [
+            {"id": 1, "statusTitle": "To Do", "tasks":[
+                {"id":1, "taskTitle":"Task 1", "description": "This is a description for this fake task", "columnId": 1, "statusColumn": "To Do", "numOfCompleteTasks":0, "numOfIncompleteTasks":0, "order": 0, "subtasks": [
+                    {"id": 1, "subtaskTitle": "Subtask 1", "isComplete": true, "taskId": 1},
+                    {"id": 2, "subtaskTitle": "Subtask 2", "isComplete": false, "taskId": 1}
+                ]}, 
+                {"id":2, "taskTitle":"Task 2", "columnId": 1, "statusColumn": "To Do", "numOfCompleteTasks":0, "numOfIncompleteTasks":0, "order": 1}
+                ]
+            },
+            {"id": 2, "statusTitle": "In Progress", "tasks":[
+                {"id":3, "taskTitle":"Task 3", "columnId": 2, "statusColumn": "In Progress", "numOfCompleteTasks":0, "numOfIncompleteTasks":0, "order": 0}
+                ]
+            },
+            {"id": 3, "statusTitle": "Done", "tasks":[
+                {"id":4, "taskTitle":"Task 4", "columnId": 3, "statusColumn": "Done", "numOfCompleteTasks":0, "numOfIncompleteTasks":0, "order": 0}, 
+                {"id":5, "taskTitle":"Task 5", "columnId": 3, "statusColumn": "Done", "numOfCompleteTasks":0, "numOfIncompleteTasks":0, "order": 1}, 
+                {"id":6, "taskTitle":"Task 6", "columnId": 3, "statusColumn": "Done", "numOfCompleteTasks":0, "numOfIncompleteTasks":0, "order": 2}
+                ]
+            },
+            {"id": 4, "statusTitle": "Dropped", "tasks":[]},
+            {"id": 5, "statusTitle": "Dropped", "tasks":[]},
+            {"id": 6, "statusTitle": "Dropped", "tasks":[]},
+            {"id": 7, "statusTitle": "Dropped", "tasks":[]},
+            {"id": 8, "statusTitle": "Dropped", "tasks":[]},
+            {"id": 9, "statusTitle": "Dropped", "tasks":[]}
+        ]   
+    },
+    {
+        "id": 2,
+        "boardTitle": "Project Two",
+        "userId": "fdklsf34j32-59ulrjfldkfjw3r-3r",
+        "columnsList": [
+            {"id": 1, "statusTitle": "To Do", "tasks":[
+                {"id":7, "taskTitle":"Task 7", "columnId": 1, "statusColumn": "To Do", "numOfCompleteTasks":0, "numOfIncompleteTasks":0, "order": 0}, 
+                {"id":8, "taskTitle":"Task 8", "columnId": 1, "statusColumn": "To Do", "numOfCompleteTasks":0, "numOfIncompleteTasks":0, "order": 1}
+            ]},
+            {"id": 2, "statusTitle": "In Progress", "tasks":[]}
+        ]
+    },
+    {
+        "id": 3,
+        "boardTitle": "Project Three",
+        "userId": "fdklsf34j32-59ulrjfldkfjw3r-3r",
+        "columnsList": [
+            {"id": 1, "statusTitle": "To Do", "tasks":[]},
+            {"id": 2, "statusTitle": "In Progress", "tasks":[]}
+        ]
+    },
+    {
+        "id": 4,
+        "boardTitle": "Project Four",
+        "userId": "fdklsf34j32-59ulrjfldkfjw3r-3r",
+        "columnsList": []
+    }
+]
